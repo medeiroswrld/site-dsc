@@ -1,0 +1,23 @@
+node_modules/
+.next/
+out/
+build/
+
+# Build artefacts
+*.tsbuildinfo
+next-env.d.ts
+
+# Env
+.env
+.env.local
+.env*.local
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*

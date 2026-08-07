@@ -1,0 +1,344 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   D.S.C. SEMINOVOS — DESIGN TOKENS
+
+   The palette is taken straight from the store's own mark: black ground,
+   silver lettering, one saturated orange. Photography sits in dark wells and
+   the orange is reserved for actions — it never decorates.
+
+   TO REBRAND: --color-brand is the only hue in the system. Everything else is
+   a neutral step between --color-bg and --color-fg.
+   ========================================================================== */
+
+@theme {
+  /* --- Surfaces: five steps of black, separated by elevation not colour -- */
+  --color-bg: #08080a; /* page ground — the logo's black */
+  --color-surface: #101014; /* alternating band */
+  --color-surface-2: #17171c; /* panels, cards, image wells */
+  --color-surface-3: #202027; /* hover, raised chips */
+
+  /* --- Foreground: the silver from the wordmark ------------------------ */
+  --color-fg: #f2f2f4; /* headings, primary text */
+  --color-fg-muted: #b4b4bb; /* body copy */
+  --color-fg-subtle: #8a8a93; /* captions, metadata, labels */
+
+  /* --- Lines ------------------------------------------------------------
+     line        decorative hairlines — dividers, table rules
+     line-strong emphasis on that same decorative role
+     control     the boundary of an interactive element, and often the only
+                 thing identifying it, so it clears WCAG 1.4.11 (3:1)
+     -------------------------------------------------------------------- */
+  --color-line: #24242b;
+  --color-line-strong: #33333c;
+  --color-control: #6c6c79; /* 3.9:1 on bg, 3.1:1 on the raised surfaces */
+
+  /* --- Brand ----------------------------------------------------------- */
+  --color-brand: #f4661b; /* fills, the car in the mark */
+  --color-brand-hover: #ff7c34;
+  --color-brand-text: #ff8f4d; /* orange used as text on dark */
+  --color-brand-ink: #0a0a0c; /* text sitting on an orange fill */
+  --color-brand-dim: #2a1409; /* orange-tinted surface */
+
+  /* --- Typography ------------------------------------------------------ */
+  --font-display: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --font-sans: var(--font-instrument), "Instrument Sans", system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", ui-monospace, monospace;
+
+  /* --- Radius: circles for actions, soft rectangles for content --------- */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+
+  /* --- Motion ---------------------------------------------------------- */
+  --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-soft: cubic-bezier(0.16, 0.84, 0.44, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    background-color: var(--color-bg);
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg-muted);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    color: var(--color-fg);
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Tabular figures wherever numbers carry meaning: prices, km, years. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-brand);
+    color: var(--color-brand-ink);
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  select {
+    appearance: none;
+  }
+
+  /* Dark form controls: keep the native dropdown list readable too. */
+  option {
+    background-color: var(--color-surface-2);
+    color: var(--color-fg);
+  }
+
+  input,
+  textarea {
+    background-clip: padding-box;
+  }
+
+  img,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+}
+
+/* ==========================================================================
+   COMPONENT PRIMITIVES
+   Patterns repeated across many files. Anything used once stays inline.
+   ========================================================================== */
+
+@layer components {
+  /* --- Eyebrow: the small mono label that opens most sections ---------- */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-fg-subtle);
+  }
+
+  /* --- The data plate: the signature spec treatment -------------------- */
+  .plate {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
+  /* --- Display scale ---------------------------------------------------- */
+  .display-1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.25rem, 1.35rem + 3.9vw, 4.75rem);
+    line-height: 0.98;
+    letter-spacing: -0.032em;
+  }
+
+  .display-2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.875rem, 1.25rem + 2.6vw, 3.5rem);
+    line-height: 1.02;
+    letter-spacing: -0.028em;
+  }
+
+  .display-3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.5rem, 1.15rem + 1.4vw, 2.25rem);
+    line-height: 1.08;
+    letter-spacing: -0.022em;
+  }
+
+  /* --- Buttons ----------------------------------------------------------
+     Fully round, echoing the circular badge the store already uses on its
+     profile. Defined once here so the whole site changes shape from one
+     place instead of from forty inline class lists.
+     -------------------------------------------------------------------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      background-color 200ms var(--ease-out-quart),
+      border-color 200ms var(--ease-out-quart),
+      color 200ms var(--ease-out-quart),
+      transform 200ms var(--ease-out-quart);
+  }
+
+  .btn:active {
+    transform: translateY(1px);
+  }
+
+  .btn:disabled {
+    pointer-events: none;
+    opacity: 0.45;
+  }
+
+  .btn-primary {
+    background-color: var(--color-brand);
+    color: var(--color-brand-ink);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-brand-hover);
+  }
+
+  .btn-secondary {
+    border: 1px solid var(--color-control);
+    color: var(--color-fg);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--color-fg);
+    background-color: var(--color-surface-2);
+  }
+
+  /* Light fill, for use directly over photography or the hero film. */
+  .btn-contrast {
+    background-color: var(--color-fg);
+    color: var(--color-bg);
+  }
+
+  .btn-contrast:hover {
+    background-color: #ffffff;
+  }
+
+  .btn-sm {
+    height: 2.25rem;
+    padding-inline: 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .btn-md {
+    height: 2.75rem;
+    padding-inline: 1.375rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-lg {
+    height: 3.25rem;
+    padding-inline: 1.75rem;
+    font-size: 0.9375rem;
+  }
+
+  /* --- Field: inputs and selects share one resting shape ---------------- */
+  .field {
+    width: 100%;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-control);
+    background-color: var(--color-surface-2);
+    color: var(--color-fg);
+    transition:
+      border-color 200ms var(--ease-out-quart),
+      background-color 200ms var(--ease-out-quart);
+  }
+
+  .field::placeholder {
+    color: var(--color-fg-subtle);
+  }
+
+  .field:hover {
+    border-color: var(--color-line-strong);
+  }
+
+  .field:focus {
+    border-color: var(--color-brand);
+    outline: none;
+  }
+
+  .field[aria-invalid="true"] {
+    border-color: var(--color-brand-text);
+  }
+}
+
+/* ==========================================================================
+   UTILITIES
+   ========================================================================== */
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Fine diagonal hatch — marks a surface as "no photograph here yet". */
+@utility hatch {
+  background-image: repeating-linear-gradient(
+    45deg,
+    color-mix(in srgb, var(--color-fg) 6%, transparent) 0 1px,
+    transparent 1px 9px
+  );
+}
+
+/* ==========================================================================
+   MOTION — everything degrades to instant under reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

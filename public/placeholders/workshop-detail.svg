@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1500" width="1200" height="1500" role="img" aria-label="DETALHE DA OFICINA">
+  <defs>
+    <pattern id="hatch" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="14" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="1500" fill="#191920"/>
+  <rect width="1200" height="1500" fill="url(#hatch)"/>
+  <path d="M54 54 h42 M54 54 v42" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="1.5" fill="none"/>
+  <path d="M1146 54 h-42 M1146 54 v42" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="1.5" fill="none"/>
+  <path d="M54 1446 h42 M54 1446 v-42" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="1.5" fill="none"/>
+  <path d="M1146 1446 h-42 M1146 1446 v-42" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="1.5" fill="none"/>
+  <text x="600" y="731.4" text-anchor="middle" font-family="ui-monospace, 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace" font-size="50" letter-spacing="7.000000000000001" fill="#9A9AA4">DETALHE DA OFICINA</text>
+  <text x="600" y="807.5" text-anchor="middle" font-family="ui-monospace, 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace" font-size="31" letter-spacing="1.24" fill="#6E6E78">substituir por foto real da D.S.C.</text>
+  <text x="56" y="1456.15" font-family="ui-monospace, 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace" font-size="29" letter-spacing="3.48" fill="#6E6E78" opacity="0.85">OFICINA</text>
+  <text x="1144" y="1456.15" text-anchor="end" font-family="ui-monospace, 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace" font-size="29" letter-spacing="3.48" fill="#6E6E78" opacity="0.85">1200×1500</text>
+</svg>

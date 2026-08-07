@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" role="img" aria-label="FOTO DO VEÍCULO">
+  <defs>
+    <pattern id="hatch" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="14" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="1000" fill="#1E1E25"/>
+  <rect width="1600" height="1000" fill="url(#hatch)"/>
+  <path d="M45 45 h35 M45 45 v35" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="1.5" fill="none"/>
+  <path d="M1555 45 h-35 M1555 45 v35" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="1.5" fill="none"/>
+  <path d="M45 955 h35 M45 955 v-35" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="1.5" fill="none"/>
+  <path d="M1555 955 h-35 M1555 955 v-35" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="1.5" fill="none"/>
+  <text x="800" y="484.4" text-anchor="middle" font-family="ui-monospace, 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace" font-size="42" letter-spacing="5.880000000000001" fill="#9A9AA4">FOTO DO VEÍCULO</text>
+  <text x="800" y="548.3" text-anchor="middle" font-family="ui-monospace, 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace" font-size="26" letter-spacing="1.04" fill="#6E6E78">substituir por foto real da D.S.C.</text>
+  <text x="47" y="963.4" font-family="ui-monospace, 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace" font-size="24" letter-spacing="2.88" fill="#6E6E78" opacity="0.85">LATERAL / RODAS</text>
+  <text x="1553" y="963.4" text-anchor="end" font-family="ui-monospace, 'IBM Plex Mono', 'SFMono-Regular', Menlo, Consolas, monospace" font-size="24" letter-spacing="2.88" fill="#6E6E78" opacity="0.85">1600×1000</text>
+</svg>

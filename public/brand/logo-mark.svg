@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 104" role="img" aria-label="D.S.C. Seminovos">
+  <title>D.S.C. Seminovos</title>
+  <!-- Hatchback profile, facing right: solid greenhouse with the glass knocked
+       out, lower body drawn as one line running over two arches into the nose. -->
+  <path
+    d="M26 54 C26 38 38 28 58 25 L124 22 C141 21 153 27 162 37 L176 54 Z"
+    fill="#F4661B"
+  />
+  <path d="M40 50 C40 41 48 35 61 33 L76 32 L76 50 Z" fill="#000" />
+  <path d="M85 32 L122 30 C133 29 142 33 149 41 L157 50 L85 50 Z" fill="#000" />
+
+  <g fill="none" stroke="#F4661B" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M176 54 C200 57 220 64 234 74" />
+    <path
+      d="M27 54
+         C21 63 25 78 38 78
+         L48 78
+         A22 22 0 0 1 92 78
+         L152 78
+         A22 22 0 0 1 196 78
+         L216 78
+         L234 74"
+    />
+  </g>
+</svg>
