@@ -10,6 +10,7 @@ import { Close, Search, Sliders } from "@/components/ui/icons";
 import { SelectField } from "@/components/ui/SelectField";
 import { Container } from "@/components/ui/Container";
 import { formatPrice } from "@/lib/format";
+import { whatsappGeneralLink } from "@/lib/whatsapp";
 import { paramsFromFilters, sortLabels } from "@/lib/stock-params";
 import {
   countActiveFilters,
@@ -18,7 +19,6 @@ import {
   sortVehicles,
   type StockFacets,
 } from "@/lib/vehicles-repository";
-import { cn } from "@/lib/utils";
 import type { Vehicle, VehicleFilterState, VehicleSort } from "@/types/vehicle";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -195,7 +195,10 @@ export function StockBrowser({
                 </AnimatePresence>
               </motion.ul>
             ) : (
-              <EmptyState onClear={clear} />
+              <EmptyState
+                onClear={clear}
+                narrowed={vehicles.length > 0}
+              />
             )}
           </div>
         </div>
@@ -353,29 +356,61 @@ function ActiveFilterChips({
   );
 }
 
-function EmptyState({ onClear }: { onClear: () => void }) {
+/**
+ * Two different nothings. A search that excluded everything is the visitor's
+ * doing and is fixed by clearing filters; an empty catalogue is the store's
+ * and offering a "clear filters" button there would just be confusing.
+ */
+function EmptyState({
+  onClear,
+  narrowed,
+}: {
+  onClear: () => void;
+  narrowed: boolean;
+}) {
   return (
     <div className="mt-9 rounded-2xl border border-line px-6 py-16 text-center sm:py-24">
       <div
         aria-hidden="true"
         className="hatch mx-auto h-20 w-32 rounded-lg border border-line"
       />
-      <p className="mt-7 font-display text-[1.25rem] font-semibold text-fg">
-        Não encontramos veículos com esses filtros.
-      </p>
-      <p className="mx-auto mt-2 max-w-sm text-[0.9375rem] leading-relaxed text-fg-subtle">
-        Tente ampliar a faixa de preço ou de ano. Se procura um modelo
-        específico, fale com a equipe — nem sempre o carro já está no site.
-      </p>
-      <button
-        type="button"
-        onClick={onClear}
-        className={cn(
-          "btn btn-primary btn-md mt-7",
-        )}
-      >
-        Limpar filtros
-      </button>
+
+      {narrowed ? (
+        <>
+          <p className="mt-7 font-display text-[1.25rem] font-semibold text-fg">
+            Não encontramos veículos com esses filtros.
+          </p>
+          <p className="mx-auto mt-2 max-w-sm text-[0.9375rem] leading-relaxed text-fg-subtle">
+            Tente ampliar a faixa de preço ou de ano. Se procura um modelo
+            específico, fale com a equipe — nem sempre o carro já está no site.
+          </p>
+          <button
+            type="button"
+            onClick={onClear}
+            className="btn btn-primary btn-md mt-7"
+          >
+            Limpar filtros
+          </button>
+        </>
+      ) : (
+        <>
+          <p className="mt-7 font-display text-[1.25rem] font-semibold text-fg">
+            Nenhum veículo publicado no momento.
+          </p>
+          <p className="mx-auto mt-2 max-w-sm text-[0.9375rem] leading-relaxed text-fg-subtle">
+            O estoque está sendo atualizado. Fale com a equipe e conte o que
+            você procura — costuma entrar carro antes de aparecer no site.
+          </p>
+          <a
+            href={whatsappGeneralLink("estoque vazio")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-primary btn-md mt-7"
+          >
+            Falar no WhatsApp
+          </a>
+        </>
+      )}
     </div>
   );
 }

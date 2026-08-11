@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Phone, WhatsApp } from "@/components/ui/icons";
+import { Phone, WhatsApp } from "@/components/ui/icons";
 import { formatPrice, vehicleTitle } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
 import { whatsappVehicleLink } from "@/lib/whatsapp";
@@ -43,7 +43,6 @@ export function VehicleContactCTA({ vehicle }: { vehicle: Vehicle }) {
               className="btn btn-primary btn-lg group w-full"
             >
               Ver veículos disponíveis
-              <ArrowRight className="text-[1rem] transition-transform duration-300 ease-[var(--ease-out-quart)] group-hover:translate-x-1" />
             </Link>
             <a
               href={whatsappVehicleLink(vehicle)}

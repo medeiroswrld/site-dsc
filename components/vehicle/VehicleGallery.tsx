@@ -78,7 +78,7 @@ export function VehicleGallery({ vehicle }: { vehicle: Vehicle }) {
               >
                 <VehiclePhoto
                   image={image}
-                  sizes="100vw"
+                  sizes="(min-width: 1024px) 1px, 100vw"
                   priority={imageIndex === 0}
                 />
               </button>
@@ -111,7 +111,7 @@ export function VehicleGallery({ vehicle }: { vehicle: Vehicle }) {
               >
                 <VehiclePhoto
                   image={active}
-                  sizes="(min-width: 1024px) 70vw, 100vw"
+                  sizes="(min-width: 1024px) 70vw, 1px"
                   priority={index === 0}
                 />
               </motion.span>
@@ -150,7 +150,7 @@ export function VehicleGallery({ vehicle }: { vehicle: Vehicle }) {
                 >
                   <VehiclePhoto
                     image={image}
-                    sizes="(min-width: 1024px) 22vw, 33vw"
+                    sizes="(min-width: 1024px) 22vw, 1px"
                     className="transition-transform duration-500 ease-[var(--ease-out-quart)] group-hover:scale-[1.04]"
                   />
 

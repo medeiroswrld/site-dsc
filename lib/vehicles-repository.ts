@@ -1,4 +1,9 @@
-import { DEMO_DATA, vehicles } from "@/data/vehicles";
+import { unstable_cache } from "next/cache";
+import { cache } from "react";
+import { vehicles as demoVehicles } from "@/data/vehicles";
+import { isSupabaseConfigured, photoUrl } from "@/lib/supabase/config";
+import { createSupabasePublicClient } from "@/lib/supabase/public";
+import type { VehicleRowWithImages } from "@/lib/supabase/types";
 import type {
   Vehicle,
   VehicleFilterState,
@@ -6,42 +11,154 @@ import type {
 } from "@/types/vehicle";
 
 /**
- * The only module that knows where stock comes from. Everything else in the
- * app talks to these functions, so swapping the in-memory demo array for a
- * CMS, Supabase or dealer-management API is a change to this file alone.
+ * The only module that knows where stock comes from.
  *
- * The functions are async on purpose: the call sites already await, so a
- * network-backed implementation drops in without touching a single component.
+ * With Supabase connected it reads from Postgres. Without it — a fresh clone,
+ * or before the store's project exists — it falls back to the demo array so
+ * the whole site still renders. Nothing above this file knows the difference.
  */
 
-export const isDemoStock = DEMO_DATA;
+const SELECT = `
+  id, slug, brand, model, version, year_manufacture, year_model, mileage,
+  price, transmission, fuel, color, doors, body_type, description, features,
+  video_url, panorama_url, featured, status, created_at, updated_at,
+  vehicle_images ( id, vehicle_id, path, alt, position, width, height )
+`;
 
 /** Newly arrived if it entered stock within this many days. */
 const RECENT_ARRIVAL_DAYS = 21;
 
-export async function getAllVehicles(): Promise<Vehicle[]> {
-  return vehicles;
+function rowToVehicle(row: VehicleRowWithImages): Vehicle {
+  const images = [...(row.vehicle_images ?? [])]
+    .sort((a, b) => a.position - b.position)
+    .map((image) => ({
+      src: photoUrl(image.path),
+      alt:
+        image.alt ||
+        `${row.brand} ${row.model} ${row.version} — foto ${image.position + 1}`,
+      width: image.width ?? 1600,
+      height: image.height ?? 1000,
+    }));
+
+  return {
+    id: row.id,
+    slug: row.slug,
+    brand: row.brand,
+    model: row.model,
+    version: row.version,
+    yearManufacture: row.year_manufacture,
+    yearModel: row.year_model,
+    mileage: row.mileage,
+    price: row.price,
+    transmission: row.transmission,
+    fuel: row.fuel,
+    color: row.color,
+    doors: row.doors,
+    bodyType: row.body_type,
+    description: row.description,
+    features: row.features ?? [],
+    images,
+    videoUrl: row.video_url ?? undefined,
+    panoramaUrl: row.panorama_url ?? undefined,
+    featured: row.featured,
+    status: row.status,
+    createdAt: row.created_at,
+  };
 }
 
+/**
+ * A vehicle with no photograph yet still needs a frame in every grid, so it
+ * gets the neutral stand-in rather than a broken image.
+ */
+function withFallbackImage(vehicle: Vehicle): Vehicle {
+  if (vehicle.images.length > 0) return vehicle;
+
+  return {
+    ...vehicle,
+    images: [
+      {
+        src: "/placeholders/vehicle-01.svg",
+        alt: `${vehicle.brand} ${vehicle.model} — foto ainda não cadastrada`,
+        width: 1600,
+        height: 1000,
+        isPlaceholder: true,
+      },
+    ],
+  };
+}
+
+/**
+ * Cache key for the whole catalogue. Every write in the panel calls
+ * `revalidateTag(VEHICLES_TAG)`, so the cache can be held indefinitely and
+ * still never serve a stale price — freshness comes from invalidation, not
+ * from expiry.
+ */
+export const VEHICLES_TAG = "vehicles";
+
+/**
+ * Reads the catalogue across requests.
+ *
+ * Without this, every page view — every click — paid a round trip to Postgres
+ * before React could render a single card. A dealership's stock changes a few
+ * times a week, so re-reading it on every visit buys nothing.
+ */
+const loadVehicles = unstable_cache(
+  async (): Promise<Vehicle[]> => {
+    const supabase = createSupabasePublicClient();
+    const { data, error } = await supabase
+      .from("vehicles")
+      .select(SELECT)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("[estoque] falha ao ler veículos:", error.message);
+      return [];
+    }
+
+    return (data as unknown as VehicleRowWithImages[]).map((row) =>
+      withFallbackImage(rowToVehicle(row)),
+    );
+  },
+  ["vehicles-all"],
+  { tags: [VEHICLES_TAG] },
+);
+
+/** `cache` dedupes within one render; `unstable_cache` holds across requests. */
+export const getAllVehicles = cache(async function getAllVehicles(): Promise<
+  Vehicle[]
+> {
+  if (!isSupabaseConfigured) return demoVehicles;
+  return loadVehicles();
+});
+
+/**
+ * Derived from the cached list rather than its own query. A used-car lot holds
+ * tens of vehicles, not thousands, so filtering in memory is faster than a
+ * second round trip and keeps one cache entry instead of one per slug.
+ */
 export async function getVehicleBySlug(
   slug: string,
 ): Promise<Vehicle | undefined> {
-  return vehicles.find((vehicle) => vehicle.slug === slug);
+  const all = await getAllVehicles();
+  return all.find((vehicle) => vehicle.slug === slug);
 }
 
 export async function getFeaturedVehicles(limit = 6): Promise<Vehicle[]> {
-  const sellable = vehicles.filter((vehicle) => vehicle.status !== "sold");
-  const featured = sellable.filter((vehicle) => vehicle.featured);
-  const rest = sellable.filter((vehicle) => !vehicle.featured);
+  const all = await getAllVehicles();
+  const sellable = all.filter((vehicle) => vehicle.status !== "sold");
 
-  return [...featured, ...rest].slice(0, limit);
+  return [
+    ...sellable.filter((vehicle) => vehicle.featured),
+    ...sellable.filter((vehicle) => !vehicle.featured),
+  ].slice(0, limit);
 }
 
 export async function getRelatedVehicles(
   vehicle: Vehicle,
   limit = 3,
 ): Promise<Vehicle[]> {
-  const others = vehicles.filter(
+  const all = await getAllVehicles();
+  const others = all.filter(
     (candidate) =>
       candidate.id !== vehicle.id && candidate.status === "available",
   );
@@ -84,13 +201,30 @@ export interface StockFacets {
   mileageMax: number;
 }
 
+const EMPTY_FACETS: StockFacets = {
+  brands: [],
+  modelsByBrand: {},
+  bodyTypes: [],
+  transmissions: [],
+  fuels: [],
+  yearMin: new Date().getFullYear() - 10,
+  yearMax: new Date().getFullYear(),
+  priceMin: 0,
+  priceMax: 0,
+  mileageMax: 0,
+};
+
+/** Built from the stock itself, so the filters never offer an empty result. */
 export async function getStockFacets(): Promise<StockFacets> {
-  const priced = vehicles
+  const list = await getAllVehicles();
+  if (!list.length) return EMPTY_FACETS;
+
+  const priced = list
     .map((vehicle) => vehicle.price)
     .filter((price): price is number => price !== null);
 
   const modelsByBrand: Record<string, string[]> = {};
-  for (const vehicle of vehicles) {
+  for (const vehicle of list) {
     const models = (modelsByBrand[vehicle.brand] ??= []);
     if (!models.includes(vehicle.model)) models.push(vehicle.model);
   }
@@ -98,23 +232,21 @@ export async function getStockFacets(): Promise<StockFacets> {
     models.sort((a, b) => a.localeCompare(b, "pt-BR"));
   }
 
-  const unique = <T>(values: T[]) => Array.from(new Set(values));
+  const unique = <T,>(values: T[]) => Array.from(new Set(values));
   const sortPt = (values: string[]) =>
     values.sort((a, b) => a.localeCompare(b, "pt-BR"));
 
   return {
-    brands: sortPt(unique(vehicles.map((vehicle) => vehicle.brand))),
+    brands: sortPt(unique(list.map((vehicle) => vehicle.brand))),
     modelsByBrand,
-    bodyTypes: sortPt(unique(vehicles.map((vehicle) => vehicle.bodyType))),
-    transmissions: sortPt(
-      unique(vehicles.map((vehicle) => vehicle.transmission)),
-    ),
-    fuels: sortPt(unique(vehicles.map((vehicle) => vehicle.fuel))),
-    yearMin: Math.min(...vehicles.map((vehicle) => vehicle.yearModel)),
-    yearMax: Math.max(...vehicles.map((vehicle) => vehicle.yearModel)),
+    bodyTypes: sortPt(unique(list.map((vehicle) => vehicle.bodyType))),
+    transmissions: sortPt(unique(list.map((vehicle) => vehicle.transmission))),
+    fuels: sortPt(unique(list.map((vehicle) => vehicle.fuel))),
+    yearMin: Math.min(...list.map((vehicle) => vehicle.yearModel)),
+    yearMax: Math.max(...list.map((vehicle) => vehicle.yearModel)),
     priceMin: priced.length ? Math.min(...priced) : 0,
     priceMax: priced.length ? Math.max(...priced) : 0,
-    mileageMax: Math.max(...vehicles.map((vehicle) => vehicle.mileage)),
+    mileageMax: Math.max(...list.map((vehicle) => vehicle.mileage)),
   };
 }
 
@@ -193,8 +325,7 @@ export function sortVehicles(list: Vehicle[], sort: VehicleSort): Vehicle[] {
   const sorted = [...list];
 
   // Sold stock always sinks to the bottom, whatever the chosen order.
-  const statusWeight = (vehicle: Vehicle) =>
-    vehicle.status === "sold" ? 1 : 0;
+  const statusWeight = (vehicle: Vehicle) => (vehicle.status === "sold" ? 1 : 0);
 
   const comparators: Record<VehicleSort, (a: Vehicle, b: Vehicle) => number> = {
     recentes: (a, b) => b.createdAt.localeCompare(a.createdAt),

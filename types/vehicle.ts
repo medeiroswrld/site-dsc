@@ -15,6 +15,7 @@ export type BodyType =
   | "Sedã"
   | "SUV"
   | "Picape"
+  | "Perua"
   | "Utilitário"
   | "Cupê";
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
+import { reducedFade, spring } from "@/lib/motion";
 import { Check, WhatsApp } from "@/components/ui/icons";
 
 /**
@@ -29,7 +30,7 @@ export function FormSuccess({
       className="rounded-2xl border border-line bg-surface p-8 lg:p-10"
       initial={{ opacity: 0, y: reduced ? 0 : 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: reduced ? 0.2 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+      transition={reduced ? reducedFade : spring.move}
     >
       <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand text-brand-ink">
         <Check className="text-[1.25rem]" />

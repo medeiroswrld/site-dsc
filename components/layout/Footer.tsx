@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/layout/Wordmark";
 import { Container } from "@/components/ui/Container";
-import { ArrowRight, Instagram } from "@/components/ui/icons";
+import { Instagram } from "@/components/ui/icons";
 import { navigation, siteConfig } from "@/lib/site";
 
 export function Footer() {
@@ -89,7 +89,6 @@ export function Footer() {
             >
               <Instagram className="text-[1.125rem]" />
               {siteConfig.instagram.handle}
-              <ArrowRight className="text-[0.875rem] transition-transform duration-200 ease-[var(--ease-out-quart)] group-hover:translate-x-1" />
             </a>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { siteConfig } from "@/lib/site";
 import { whatsappVehicleLink } from "@/lib/whatsapp";
 import type { Vehicle } from "@/types/vehicle";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
+import { reducedFade, spring } from "@/lib/motion";
 
 /**
  * Contextual action bar for small screens. It appears once the gallery has
@@ -36,7 +36,7 @@ export function VehicleMobileBar({ vehicle }: { vehicle: Vehicle }) {
           initial={{ y: reduced ? 0 : "100%", opacity: reduced ? 0 : 1 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: reduced ? 0 : "100%", opacity: reduced ? 0 : 1 }}
-          transition={{ duration: reduced ? 0.15 : 0.3, ease: EASE }}
+          transition={reduced ? reducedFade : spring.snap}
         >
           <div className="flex items-center gap-3 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
             <div className="min-w-0">

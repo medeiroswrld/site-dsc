@@ -8,8 +8,9 @@ import {
   useScroll,
   useTransform,
 } from "motion/react";
-import { ArrowDown, ArrowRight, Play, WhatsApp } from "@/components/ui/icons";
+import { Play, WhatsApp } from "@/components/ui/icons";
 import { Container } from "@/components/ui/Container";
+import FoldText from "@/components/reactbits/FoldText";
 import { media, siteConfig } from "@/lib/site";
 import { whatsappGeneralLink } from "@/lib/whatsapp";
 
@@ -135,23 +136,30 @@ export function HeroVideo() {
       >
         <Container size="wide">
           <div className="max-w-[42rem]">
-            <motion.p
-              className="plate text-[0.625rem] uppercase tracking-[0.2em] text-fg-muted sm:text-[0.6875rem]"
-              initial={{ opacity: 0, y: reduced ? 0 : 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: EASE, delay: reduced ? 0 : 0.25 }}
-            >
-              {siteConfig.name} · {siteConfig.city} — {siteConfig.state}
-            </motion.p>
-
-            <motion.h1
-              className="mt-5 font-display font-semibold leading-[0.99] tracking-[-0.035em] text-[clamp(2.125rem,1.15rem+3.6vw,3.875rem)]"
-              initial={{ opacity: 0, y: reduced ? 0 : 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: EASE, delay: reduced ? 0 : 0.36 }}
-            >
-              Carros selecionados, oficina própria e negociação sem enrolação.
-            </motion.h1>
+            {/*
+              Folded per word, not per character. The headline runs to sixty
+              characters — at the component's default stagger that would be
+              nearly three seconds of cascade on the largest element of the
+              page, which reads as a slow site rather than a considered one.
+              Eight words land in under a second.
+            */}
+            <h1 className="font-display font-semibold leading-[0.99] tracking-[-0.035em] text-[clamp(2.125rem,1.15rem+3.6vw,3.875rem)]">
+              <FoldText
+                text="Carros selecionados, oficina própria e negociação sem enrolação."
+                splitBy="word"
+                hinge="top"
+                trigger="mount"
+                duration={0.6}
+                stagger={0.055}
+                ease="power3.out"
+                perspective={900}
+                creaseShading={0.5}
+                fontSize="inherit"
+                fontWeight="inherit"
+                color="var(--color-fg)"
+                className="fold-text--flush"
+              />
+            </h1>
 
             <motion.p
               className="mt-6 max-w-[34rem] text-[0.9375rem] leading-relaxed text-fg-muted sm:text-[1rem]"
@@ -175,7 +183,6 @@ export function HeroVideo() {
                 className="btn btn-primary btn-lg"
               >
                 Ver estoque
-                <ArrowRight className="text-[1rem] transition-transform duration-300 ease-[var(--ease-out-quart)] group-hover:translate-x-1" />
               </a>
 
               <a
@@ -218,13 +225,6 @@ export function HeroVideo() {
         <span className="plate text-[0.6875rem] uppercase tracking-[0.14em]">
           Veja o que está disponível agora
         </span>
-        <motion.span
-          animate={reduced ? undefined : { y: [0, 4, 0] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-          className="flex"
-        >
-          <ArrowDown className="text-[1rem]" />
-        </motion.span>
       </motion.a>
     </section>
   );

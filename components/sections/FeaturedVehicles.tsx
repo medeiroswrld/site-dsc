@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Reveal } from "@/components/motion/Reveal";
 import { VehicleRail } from "@/components/vehicle/VehicleRail";
-import { ArrowRight } from "@/components/ui/icons";
 import { Container } from "@/components/ui/Container";
 import { UnderlineLink } from "@/components/ui/UnderlineLink";
 import type { Vehicle } from "@/types/vehicle";
@@ -56,7 +55,6 @@ export function FeaturedVehicles({ vehicles }: { vehicles: Vehicle[] }) {
           className="btn btn-secondary btn-lg group w-full"
         >
           Ver estoque completo
-          <ArrowRight className="text-[1rem] transition-transform duration-300 ease-[var(--ease-out-quart)] group-hover:translate-x-1" />
         </Link>
       </Container>
 

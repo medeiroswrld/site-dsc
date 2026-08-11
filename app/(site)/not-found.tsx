@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { HeaderOffset } from "@/components/layout/Header";
 import { Container } from "@/components/ui/Container";
-import { ArrowRight } from "@/components/ui/icons";
 import { whatsappGeneralLink } from "@/lib/whatsapp";
 
 export default function NotFound() {
@@ -25,7 +24,6 @@ export default function NotFound() {
               className="btn btn-primary btn-lg"
             >
               Ver estoque
-              <ArrowRight className="text-[1rem] transition-transform duration-300 ease-[var(--ease-out-quart)] group-hover:translate-x-1" />
             </Link>
             <a
               href={whatsappGeneralLink("página não encontrada")}

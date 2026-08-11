@@ -8,7 +8,7 @@ import { MobileMenu } from "@/components/layout/MobileMenu";
 import { Wordmark } from "@/components/layout/Wordmark";
 import { WhatsApp } from "@/components/ui/icons";
 import { Container } from "@/components/ui/Container";
-import { isDemoStock } from "@/lib/vehicles-repository";
+import { isDemoStock } from "@/lib/demo";
 import { navigation, siteConfig } from "@/lib/site";
 import { whatsappGeneralLink } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";

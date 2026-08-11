@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { reducedFade, spring } from "@/lib/motion";
 import { useEffect } from "react";
 import { Close, Instagram, MapPin, Phone, WhatsApp } from "@/components/ui/icons";
 import { navigation, siteConfig } from "@/lib/site";
@@ -81,8 +82,7 @@ export function MobileMenu({ open, onClose, pathname }: MobileMenuProps) {
                       initial={{ opacity: 0, y: reduced ? 0 : 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{
-                        duration: reduced ? 0.15 : 0.34,
-                        ease: EASE,
+                        ...(reduced ? reducedFade : spring.move),
                         delay: reduced ? 0 : 0.04 + index * 0.035,
                       }}
                     >

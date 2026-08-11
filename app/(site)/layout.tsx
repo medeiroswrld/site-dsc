@@ -6,7 +6,7 @@ import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { autoDealerSchema, websiteSchema } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
-import "./globals.css";
+import "../globals.css";
 
 /* Display: an industrial grotesque with the compactness of shop signage.
    Body: a humanist sans that stays comfortable at long paragraph lengths.

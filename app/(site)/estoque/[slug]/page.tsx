@@ -105,12 +105,14 @@ export default async function VehiclePage({ params }: PageProps) {
       <Container size="wide" className="pb-24 pt-14 lg:pb-28 lg:pt-16">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-14">
           <div className="space-y-12 lg:col-span-7 xl:col-span-8">
-            <Reveal as="section">
-              <h2 className="eyebrow">Sobre este veículo</h2>
-              <p className="mt-5 max-w-2xl text-[1.0625rem] leading-relaxed text-fg-muted">
-                {vehicle.description}
-              </p>
-            </Reveal>
+            {vehicle.description.trim() && (
+              <Reveal as="section">
+                <h2 className="eyebrow">Sobre este veículo</h2>
+                <p className="mt-5 max-w-2xl text-[1.0625rem] leading-relaxed text-fg-muted">
+                  {vehicle.description}
+                </p>
+              </Reveal>
+            )}
 
             <Reveal>
               <VehicleSpecs vehicle={vehicle} />

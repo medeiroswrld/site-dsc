@@ -8,7 +8,6 @@ import {
   TextField,
 } from "@/components/forms/Field";
 import { FormSuccess } from "@/components/forms/FormSuccess";
-import { ArrowLeft, ArrowRight } from "@/components/ui/icons";
 import {
   buildLeadWhatsAppUrl,
   formatPhoneInput,
@@ -325,7 +324,6 @@ export function SellCarForm() {
             onClick={() => goTo(step - 1)}
             className="group inline-flex h-13 items-center gap-2 rounded-full border border-control px-5 text-[0.9375rem] font-medium text-fg transition-colors duration-200 hover:border-fg"
           >
-            <ArrowLeft className="text-[1rem] transition-transform duration-300 ease-[var(--ease-out-quart)] group-hover:-translate-x-1" />
             Voltar
           </button>
         )}
@@ -337,7 +335,6 @@ export function SellCarForm() {
             className="btn btn-primary btn-lg"
           >
             Continuar
-            <ArrowRight className="text-[1rem] transition-transform duration-300 ease-[var(--ease-out-quart)] group-hover:translate-x-1" />
           </button>
         ) : (
           <button

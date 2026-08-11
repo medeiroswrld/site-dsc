@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { VehiclePhoto } from "@/components/vehicle/VehiclePhoto";
 import { VehicleSpecPlate } from "@/components/vehicle/VehicleSpecPlate";
-import { ArrowRight } from "@/components/ui/icons";
 import { formatPrice, vehicleShortTitle } from "@/lib/format";
 import { isRecentArrival } from "@/lib/vehicles-repository";
 import { cn } from "@/lib/utils";
@@ -39,7 +38,7 @@ export function VehicleCard({
   const cover = vehicle.images[0];
 
   return (
-    <article className={cn("group relative flex flex-col", className)}>
+    <article className={cn("group pressable relative flex flex-col", className)}>
       <div className="relative aspect-[4/2.7] overflow-hidden rounded-xl bg-surface-2">
         {cover && (
           <VehiclePhoto
@@ -68,7 +67,7 @@ export function VehicleCard({
         )}
 
         <span className="plate absolute bottom-3 right-3 rounded-full bg-bg/70 px-2.5 py-1.5 text-[0.625rem] leading-none text-fg backdrop-blur-md">
-          {vehicle.images.length} fotos
+          {vehicle.images.length} {vehicle.images.length === 1 ? "foto" : "fotos"}
         </span>
       </div>
 
@@ -95,7 +94,6 @@ export function VehicleCard({
 
         <span className="flex items-center gap-1.5 text-[0.8125rem] text-fg-subtle transition-colors duration-200 group-hover:text-brand-text">
           {sold ? "Ver detalhes" : "Ver veículo"}
-          <ArrowRight className="text-[0.875rem] transition-transform duration-300 ease-[var(--ease-out-quart)] group-hover:translate-x-1" />
         </span>
       </div>
     </article>

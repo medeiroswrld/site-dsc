@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Reveal } from "@/components/motion/Reveal";
-import { ArrowRight, WhatsApp } from "@/components/ui/icons";
+import { WhatsApp } from "@/components/ui/icons";
 import { Container } from "@/components/ui/Container";
 import { whatsappVisitLink } from "@/lib/whatsapp";
 
@@ -34,7 +34,6 @@ export function FinalCTA({
                 className="btn btn-primary btn-lg"
               >
                 Ver estoque
-                <ArrowRight className="text-[1rem] transition-transform duration-300 ease-[var(--ease-out-quart)] group-hover:translate-x-1" />
               </Link>
             )}
 

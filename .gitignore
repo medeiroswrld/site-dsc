@@ -1,23 +1,21 @@
-node_modules/
-.next/
-out/
-build/
+node_modules
+.next
+out
+build
 
-# Build artefacts
-*.tsbuildinfo
-next-env.d.ts
-
-# Env
 .env
 .env.local
 .env*.local
 
-# Editor / OS
+*.tsbuildinfo
+next-env.d.ts
+
+# Vinculo local com o projeto na Vercel
+.vercel
+
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
-
-# Logs
 *.log
 npm-debug.log*

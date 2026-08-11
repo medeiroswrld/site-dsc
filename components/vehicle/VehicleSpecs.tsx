@@ -16,6 +16,8 @@ export function VehicleSpecs({ vehicle }: { vehicle: Vehicle }) {
     ["Carroceria", vehicle.bodyType],
   ];
 
+  const filled = rows.filter(([, value]) => value.trim().length > 0);
+
   return (
     <section aria-labelledby="ficha-titulo">
       <h2 id="ficha-titulo" className="eyebrow">
@@ -23,7 +25,7 @@ export function VehicleSpecs({ vehicle }: { vehicle: Vehicle }) {
       </h2>
 
       <dl className="mt-5 grid border-t border-line sm:grid-cols-2 sm:gap-x-10">
-        {rows.map(([label, value]) => (
+        {filled.map(([label, value]) => (
           <div
             key={label}
             className="flex items-baseline justify-between gap-4 border-b border-line py-3"

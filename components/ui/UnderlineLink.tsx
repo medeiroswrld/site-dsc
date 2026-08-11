@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ArrowRight } from "@/components/ui/icons";
 import { cn } from "@/lib/utils";
 
 interface UnderlineLinkProps {
@@ -9,13 +8,12 @@ interface UnderlineLinkProps {
   external?: boolean;
   /** An icon that reads before the label, e.g. the Instagram glyph. */
   leading?: React.ReactNode;
-  arrow?: boolean;
   className?: string;
 }
 
 /**
- * The site's standalone text link: label on a rule, arrow that steps forward
- * on hover, rule warming to the brand orange.
+ * The site's standalone text link: a label on a rule that warms to the brand
+ * colour on hover.
  *
  * The rule hugs the text while the anchor itself carries vertical padding, so
  * the tap target clears 40px without the underline drifting away from the
@@ -26,7 +24,6 @@ export function UnderlineLink({
   children,
   external,
   leading,
-  arrow = true,
   className,
 }: UnderlineLinkProps) {
   const content = (
@@ -35,9 +32,6 @@ export function UnderlineLink({
       <span className="border-b border-line-strong pb-1.5 transition-colors duration-200 group-hover:border-brand">
         {children}
       </span>
-      {arrow && (
-        <ArrowRight className="text-[1rem] transition-transform duration-300 ease-[var(--ease-out-quart)] group-hover:translate-x-1" />
-      )}
     </>
   );
 

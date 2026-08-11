@@ -61,24 +61,41 @@ schema.org. Com fotos reais, o AVIF/WebP e o `srcset` passam a valer.
 
 ### 3. Logo
 
-O lockup já está no site. `components/layout/Wordmark.tsx` combina a lettering
-"D.S.C / SEMINOVOS" na fonte do próprio site com o carro laranja em SVG inline
-(`CarMark`), que também vira o ícone da aba em `app/icon.svg`.
+O logo oficial da loja está no site. `components/layout/Wordmark.tsx` serve a
+arte original; o carro sozinho (`CarMark`) é o que o painel usa e também o ícone
+da aba, em `app/icon.png`.
 
-**O carro foi redesenhado em vetor a partir da foto de perfil do Instagram.**
-Ficou próximo, mas não é o arquivo original. Quando tiver o logo em alta — SVG
-de preferência, ou PNG com fundo transparente — coloque em `public/brand/` e
-troque o `<CarMark />` por um `<Image>`. As proporções já batem.
+| Arquivo em `public/brand/` | Uso |
+| --- | --- |
+| `dsc-seminovos.png` | lockup com a lettering prateada — **é o que o site usa** |
+| `dsc-seminovos-dark.png` | lockup original, lettering preta, para fundo claro |
+| `dsc-mark.png` | só o carro laranja |
 
-### 4. Estoque real
+Os três saíram do mesmo arquivo entregue pela loja, recortados no limite da
+arte e com fundo transparente. A única edição foi levantar a lettering de preto
+para o prateado do site (`--color-fg`) — sem isso ela sumiria no fundo preto. O
+laranja é o do arquivo original, intocado.
 
-`data/vehicles.ts` contém **12 veículos fictícios**, marcados no topo do arquivo.
-Enquanto `DEMO_DATA` for `true`, uma faixa avisa isso no topo de todas as páginas.
+Se um dia chegar o logo em vetor (SVG), é só trocar os `<Image>` do `Wordmark`:
+as proporções são as mesmas.
 
-Para conectar o estoque real, mexa **só** em `lib/vehicles-repository.ts` — é o
-único módulo que sabe de onde vêm os dados. As funções já são `async` e todos os
-pontos de uso já usam `await`, então trocar o array por um CMS, Supabase ou API
-de estoque não toca em nenhum componente.
+### 4. Conectar o banco (e ligar o painel)
+
+Enquanto não houver Supabase configurado, o site roda com **12 veículos
+fictícios** de `data/vehicles.ts` e mostra uma faixa avisando disso. A faixa
+some sozinha assim que o banco entra — não há flag para lembrar de desligar.
+
+Abra **http://localhost:3000/admin** e a tela de configuração lista os quatro
+passos. Em resumo:
+
+1. Criar um projeto gratuito em [supabase.com](https://supabase.com), região
+   South America (São Paulo).
+2. Colar `supabase/schema.sql` no SQL Editor e rodar. Cria as tabelas, o bucket
+   de fotos e as regras de acesso.
+3. Em Authentication › Users › Add user, criar o e-mail e a senha do painel
+   (marcando *Auto Confirm User*).
+4. Copiar as três chaves de Settings › API para um `.env.local` — o formato
+   está em `.env.example` — e reiniciar o servidor.
 
 ### 5. Dados comerciais a confirmar
 
@@ -90,8 +107,51 @@ Em `lib/site.ts`:
 - `geo` — coordenadas exatas do pino no Maps.
 - `hours` — confirmar os horários de atendimento.
 
-Em `app/politica-de-privacidade/page.tsx`: razão social, CNPJ e e-mail para
-solicitações de dados.
+Em `app/(site)/politica-de-privacidade/page.tsx`: razão social, CNPJ e e-mail
+para solicitações de dados.
+
+---
+
+## O painel
+
+`/admin` — protegido por login, `noindex`, fora do sitemap.
+
+| Tela | O que faz |
+| --- | --- |
+| `/admin` | Lista o estoque, busca, filtra por situação, e permite trocar situação e destaque direto da linha |
+| `/admin/veiculos/novo` | Cadastro: identificação, números, ficha técnica, texto do anúncio e publicação |
+| `/admin/veiculos/[id]` | Edição, gerenciamento das fotos e exclusão |
+| `/admin/login` | Entrada |
+| `/admin/configurar` | Guia que aparece enquanto o Supabase não estiver conectado |
+
+**Fotos.** Envio de várias de uma vez (JPG, PNG, WebP, AVIF ou **SVG**, até
+10 MB cada). A ordem é ajustada por setas — funciona no celular e no teclado, ao
+contrário de arrastar-e-soltar. A primeira foto é a capa: é ela que vai para os
+cards e para o compartilhamento de link.
+
+Foto comum é reduzida no próprio aparelho e vira WebP antes de subir. **SVG sobe
+do jeito que veio** — é vetor, não tem pixel para descartar, e rasterizar só
+deixaria borrado. Por isso ele também pula o otimizador do `next/image`, que
+recusa SVG por padrão, e é servido direto do Storage.
+
+Se o seu projeto Supabase é anterior a essa mudança, o bucket ainda vai recusar
+SVG com um erro de "mime type". Rode `supabase/schema.sql` de novo no SQL
+Editor: ele atualiza a lista de tipos aceitos sem tocar nas fotos já enviadas.
+
+**Situação.** *Disponível*, *Reservado* e *Vendido*. Um carro vendido continua
+no site com o preço riscado, sai do sitemap e recebe `noindex` — o link que
+alguém já tem continua funcionando, mas ele para de competir na busca.
+
+**Preço em branco** vira "Sob consulta" no site. Nunca é preenchido sozinho.
+
+**Segurança.** Nenhuma escrita acontece pelo navegador. O formulário chama uma
+Server Action, que revalida a sessão e só então usa a chave `service_role` —
+que nunca sai do servidor. As tabelas têm RLS com permissão pública apenas de
+leitura. Excluir um veículo apaga também as fotos no Storage, para o bucket não
+encher de arquivo órfão.
+
+**Publicação imediata.** Toda gravação revalida `/`, `/estoque`, a página do
+veículo e o `sitemap.xml`, então o site reflete a mudança sem esperar cache.
 
 ---
 
@@ -140,7 +200,10 @@ campo de formulário das linhas puramente decorativas.
 ## Estrutura
 
 ```
-app/                    rotas (App Router)
+app/(site)/             site público
+app/(admin)/admin/      painel de cadastro
+supabase/schema.sql     esquema do banco, para rodar uma vez
+components/admin/       tabela, formulário, gerenciador de fotos
 components/layout/      header, menu mobile, footer, WhatsApp flutuante
 components/sections/    seções da home e institucionais
 components/vehicle/     card, grade, filtros, galeria, ficha, CTAs
@@ -148,6 +211,8 @@ components/forms/       campos, financiamento, venda, contato
 components/motion/      Reveal, MediaReveal, CountUp
 components/ui/          Container, Button, ícones, links, JSON-LD
 lib/                    site (NAP), repositório, SEO, WhatsApp, formatação
+lib/admin/              auth, validação, server actions, consultas do painel
+lib/supabase/           clientes público, de sessão e de service role
 data/                   estoque de demonstração
 types/                  modelo do veículo
 ```

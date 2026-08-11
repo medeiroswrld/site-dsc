@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { WhatsApp } from "@/components/ui/icons";
 import { whatsappGeneralLink } from "@/lib/whatsapp";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
+import { reducedFade, spring } from "@/lib/motion";
 
 /**
  * Floating contact affordance. It stays out of the way until the visitor has
@@ -40,7 +40,7 @@ export function WhatsAppButton() {
           initial={{ opacity: 0, y: reduced ? 0 : 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: reduced ? 0 : 12 }}
-          transition={{ duration: reduced ? 0.15 : 0.32, ease: EASE }}
+          transition={reduced ? reducedFade : spring.snap}
         >
           <WhatsApp className="text-[1.25rem]" />
           <span className="text-[0.875rem] font-medium">WhatsApp</span>

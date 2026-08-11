@@ -210,20 +210,36 @@
     border-radius: 9999px;
     font-weight: 500;
     white-space: nowrap;
+    /* Colour settles over 200ms; the press reacts in 110ms, because the press
+       is the acknowledgement and it has to feel instant. */
     transition:
       background-color 200ms var(--ease-out-quart),
       border-color 200ms var(--ease-out-quart),
       color 200ms var(--ease-out-quart),
-      transform 200ms var(--ease-out-quart);
+      transform 110ms cubic-bezier(0.2, 0, 0, 1);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
+  /* Fires on pointer-down, not on release: the button answers the finger. */
   .btn:active {
-    transform: translateY(1px);
+    transform: scale(0.97);
   }
 
   .btn:disabled {
     pointer-events: none;
     opacity: 0.45;
+  }
+
+  /* Anything tappable that is not a .btn — cards, thumbnails, list rows. */
+  .pressable {
+    transition: transform 110ms cubic-bezier(0.2, 0, 0, 1);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .pressable:active {
+    transform: scale(0.985);
   }
 
   .btn-primary {
@@ -271,6 +287,20 @@
     height: 3.25rem;
     padding-inline: 1.75rem;
     font-size: 0.9375rem;
+  }
+
+
+  /* --- FoldText (React Bits) -------------------------------------------
+     The component joins word panels with a non-breaking space. When a
+     headline wraps, that space lands at the start of the new line and
+     indents it. Spacing the panels themselves keeps the left edge flush.
+     -------------------------------------------------------------------- */
+  .fold-text--flush .fold-text-whitespace {
+    font-size: 0;
+  }
+
+  .fold-text--flush .fold-text-segment {
+    margin-inline-end: 0.26em;
   }
 
   /* --- Field: inputs and selects share one resting shape ---------------- */
