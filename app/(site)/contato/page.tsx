@@ -59,7 +59,7 @@ export default async function ContactPage() {
         description={`A loja fica na Vila Nastri, em ${siteConfig.city}. Escolha o canal que preferir ou mande a mensagem pelo formulário.`}
       />
 
-      <Container size="wide" className="pb-20 lg:pb-24">
+      <Container size="wide" className="pb-14 lg:pb-18">
         <Reveal>
           <ul className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3">
             {channels.map(({ label, value, href, Icon, external }) => (

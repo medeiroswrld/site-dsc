@@ -27,7 +27,7 @@ export default async function SellCarPage() {
         description="Envie os dados do veículo. A equipe da D.S.C. analisa as informações e entra em contato."
       />
 
-      <Container size="wide" className="pb-24 lg:pb-32">
+      <Container size="wide" className="pb-16 lg:pb-20">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
           <Reveal className="lg:col-span-7">
             <SellCarForm />

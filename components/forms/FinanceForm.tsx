@@ -15,6 +15,7 @@ import {
   isValidPhone,
 } from "@/lib/lead";
 import type { Vehicle } from "@/types/vehicle";
+import { useStore } from "@/components/layout/StoreProvider";
 
 interface FinanceFormProps {
   /** Every vehicle in stock, so the visitor picks rather than types. */
@@ -26,6 +27,7 @@ interface FinanceFormProps {
 type Errors = Partial<Record<"name" | "phone" | "vehicle" | "consent", string>>;
 
 export function FinanceForm({ vehicles, preselectedSlug }: FinanceFormProps) {
+  const store = useStore();
   const options = vehicles
     .filter((vehicle) => vehicle.status !== "sold")
     .map((vehicle) => `${vehicle.brand} ${vehicle.model} ${vehicle.version} ${vehicle.yearModel}`);
@@ -81,7 +83,7 @@ export function FinanceForm({ vehicles, preselectedSlug }: FinanceFormProps) {
         { label: "Entrada aproximada", value: downPayment },
         { label: "Observações", value: message },
       ],
-    });
+    }, store.whatsapp);
 
     setSentUrl(url);
     window.open(url, "_blank", "noopener,noreferrer");

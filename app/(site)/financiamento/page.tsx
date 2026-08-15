@@ -37,7 +37,7 @@ export default async function FinancePage({
         description="Informe o veículo de interesse e alguns dados básicos. A equipe da D.S.C. entra em contato para apresentar as possibilidades disponíveis."
       />
 
-      <Container size="wide" className="pb-24 lg:pb-32">
+      <Container size="wide" className="pb-16 lg:pb-20">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
           <Reveal className="lg:col-span-7 xl:col-span-7">
             <FinanceForm vehicles={vehicles} preselectedSlug={veiculo} />

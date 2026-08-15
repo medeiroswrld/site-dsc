@@ -18,7 +18,7 @@ export function WorkshopSection({
 }) {
   return (
     <section
-      className="bg-surface py-20 lg:py-28"
+      className="bg-surface py-14 lg:py-20"
       aria-labelledby="oficina-titulo"
     >
       <Container size="wide">

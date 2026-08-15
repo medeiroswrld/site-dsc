@@ -20,7 +20,7 @@ export async function InstagramSection() {
   if (!posts.length) return null;
 
   return (
-    <section className="bg-bg py-20 lg:py-24" aria-labelledby="instagram-titulo">
+    <section className="bg-bg py-14 lg:py-18" aria-labelledby="instagram-titulo">
       <Container size="wide">
         <Reveal className="flex flex-wrap items-end justify-between gap-x-10 gap-y-5">
           <div>

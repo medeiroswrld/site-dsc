@@ -22,7 +22,7 @@ export function PageHeader({
   return (
     <>
       <HeaderOffset />
-      <section className={cn("bg-bg pb-9 pt-10 lg:pb-12 lg:pt-16", className)}>
+      <section className={cn("bg-bg pb-7 pt-8 lg:pb-9 lg:pt-12", className)}>
         <Container size="wide">
           <Reveal className="flex flex-wrap items-end justify-between gap-x-12 gap-y-6">
             <div className="max-w-3xl">

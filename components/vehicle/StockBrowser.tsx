@@ -73,7 +73,7 @@ export function StockBrowser({
 
   return (
     <>
-      <Container size="wide" className="pb-24 lg:pb-32">
+      <Container size="wide" className="pb-16 lg:pb-20">
         <div className="grid gap-x-10 gap-y-8 lg:grid-cols-12 xl:gap-x-14">
           <aside className="hidden lg:col-span-3 lg:block">
             <div className="sticky top-28">

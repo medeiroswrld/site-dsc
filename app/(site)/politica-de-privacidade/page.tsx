@@ -73,7 +73,7 @@ export default async function PrivacyPolicyPage() {
         description={`Como a ${siteConfig.name} trata as informações enviadas pelo site.`}
       />
 
-      <Container size="wide" className="pb-24 lg:pb-32">
+      <Container size="wide" className="pb-16 lg:pb-20">
         <div className="max-w-2xl">
           {sections.map((section, index) => (
             <section

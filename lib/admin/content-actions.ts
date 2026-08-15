@@ -155,6 +155,7 @@ const TEXT_FIELDS = [
   "phoneDisplay",
   "phoneE164",
   "whatsapp",
+  "whatsappSellCar",
   "street",
   "neighbourhood",
   "city",

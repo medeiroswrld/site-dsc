@@ -39,11 +39,15 @@ export const siteConfig = {
   },
 
   /**
-   * WhatsApp number in international digits-only form.
-   * INTEGRATION POINT: confirm the store's WhatsApp line with D.S.C. — the
-   * landline above is used as the fallback until it is provided.
+   * WhatsApp da loja, só dígitos com o código do país.
+   *
+   * São dois de propósito. O geral atende estoque, financiamento e contato —
+   * é onde o comprador chega. O de avaliação recebe quem quer vender ou dar
+   * o carro na troca, que é uma conversa diferente e costuma ficar com outra
+   * pessoa da equipe.
    */
-  whatsapp: "551532710164",
+  whatsapp: "5515992268988",
+  whatsappSellCar: "551532710164",
 
   instagram: {
     handle: "@dsc_seminovos",

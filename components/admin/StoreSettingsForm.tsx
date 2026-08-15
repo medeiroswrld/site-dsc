@@ -52,9 +52,15 @@ export function StoreSettingsForm({ store }: { store: StoreInfo }) {
         />
         <Field
           name="whatsapp"
-          label="WhatsApp"
+          label="WhatsApp (vendas)"
           defaultValue={store.whatsapp}
-          hint="Só dígitos, com 55 na frente e sem sinais: 5515999998888"
+          hint="Estoque, financiamento e contato. Só dígitos com 55 na frente: 5515999998888"
+        />
+        <Field
+          name="whatsappSellCar"
+          label="WhatsApp (avaliação)"
+          defaultValue={store.whatsappSellCar}
+          hint='Recebe quem quer vender ou trocar, na página "Venda seu carro"'
         />
         <Field
           name="foundedYearsText"

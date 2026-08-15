@@ -18,7 +18,7 @@ const facts = [
 
 export function AboutSection({ facade }: { facade: ResolvedMedia }) {
   return (
-    <section className="bg-bg py-20 lg:py-28" aria-labelledby="sobre-titulo">
+    <section className="bg-bg py-14 lg:py-20" aria-labelledby="sobre-titulo">
       <Container size="wide">
         <div className="grid items-start gap-10 lg:grid-cols-12 lg:gap-14">
           <MediaReveal className="relative aspect-[4/3] rounded-2xl bg-surface-2 lg:col-span-7 lg:aspect-[4/3.1]">

@@ -12,6 +12,7 @@ import { isDemoStock } from "@/lib/demo";
 import { navigation, siteConfig } from "@/lib/site";
 import { whatsappGeneralLink } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
+import { useStore } from "@/components/layout/StoreProvider";
 
 /**
  * The header sits over the home hero as a transparent bar and picks up a solid
@@ -19,6 +20,7 @@ import { cn } from "@/lib/utils";
  * the first pixel.
  */
 export function Header() {
+  const store = useStore();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -110,7 +112,7 @@ export function Header() {
               </Link>
 
               <a
-                href={whatsappGeneralLink()}
+                href={whatsappGeneralLink(undefined, store.whatsapp)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={cn(

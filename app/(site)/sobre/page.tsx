@@ -29,7 +29,7 @@ export default async function AboutPage() {
         description="Seminovos selecionados, atendimento direto e oficina própria — a operação inteira num endereço só."
       />
 
-      <Container size="wide" className="pb-20 lg:pb-28">
+      <Container size="wide" className="pb-14 lg:pb-20">
         <MediaReveal className="relative aspect-[16/10] rounded-2xl bg-surface-2 lg:aspect-[16/8]">
           <Image
             src={media.facade.src}

@@ -11,7 +11,7 @@ export async function LocationSection() {
 
   return (
     <section
-      className="bg-surface py-20 lg:py-24"
+      className="bg-surface py-14 lg:py-18"
       aria-labelledby="localizacao-titulo"
     >
       <Container size="wide">

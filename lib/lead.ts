@@ -39,8 +39,12 @@ export function buildLeadMessage(lead: Lead): string {
   return lines.join("\n");
 }
 
-export function buildLeadWhatsAppUrl(lead: Lead): string {
-  return `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(
+/**
+ * O número é parâmetro porque a loja tem dois: vendas e avaliação. Quem
+ * chama sabe de qual conversa se trata; este arquivo não.
+ */
+export function buildLeadWhatsAppUrl(lead: Lead, number: string = siteConfig.whatsapp): string {
+  return `https://wa.me/${number}?text=${encodeURIComponent(
     buildLeadMessage(lead),
   )}`;
 }

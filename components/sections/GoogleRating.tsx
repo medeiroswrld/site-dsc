@@ -26,7 +26,7 @@ export async function GoogleRating() {
   const scale = siteConfig.rating.scale;
 
   return (
-    <section className="bg-surface py-16 lg:py-20" aria-labelledby="reputacao-titulo">
+    <section className="bg-surface py-11 lg:py-14" aria-labelledby="reputacao-titulo">
       <Container size="wide">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
           <Reveal className="lg:col-span-4">

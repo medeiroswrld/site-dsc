@@ -3,6 +3,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { WhatsApp } from "@/components/ui/icons";
 import { Container } from "@/components/ui/Container";
 import { whatsappVisitLink } from "@/lib/whatsapp";
+import { getStoreInfo } from "@/lib/site-content-repository";
 
 interface FinalCTAProps {
   headline?: string;
@@ -11,13 +12,14 @@ interface FinalCTAProps {
   showStockLink?: boolean;
 }
 
-export function FinalCTA({
+export async function FinalCTA({
   headline = "Encontrou um carro que quer ver de perto?",
   body = "Fale com a D.S.C. e combine uma visita à loja.",
   showStockLink = true,
 }: FinalCTAProps) {
+  const store = await getStoreInfo();
   return (
-    <section className="bg-surface py-20 lg:py-24">
+    <section className="bg-surface py-14 lg:py-18">
       <Container size="wide">
         <Reveal className="flex flex-col gap-9 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
           <div className="max-w-2xl">
@@ -38,7 +40,7 @@ export function FinalCTA({
             )}
 
             <a
-              href={whatsappVisitLink()}
+              href={whatsappVisitLink(store.whatsapp)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary btn-lg"

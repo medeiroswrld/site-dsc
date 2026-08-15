@@ -14,6 +14,7 @@ import {
   isValidPhone,
 } from "@/lib/lead";
 import { cn } from "@/lib/utils";
+import { useStore } from "@/components/layout/StoreProvider";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -55,6 +56,7 @@ const emptyValues: Values = {
  * screen answerable from memory.
  */
 export function SellCarForm() {
+  const store = useStore();
   const reduced = useReducedMotion();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
@@ -121,7 +123,7 @@ export function SellCarForm() {
         { label: "Cor", value: values.color },
         { label: "Observações", value: values.notes },
       ],
-    });
+    }, store.whatsappSellCar);
 
     setSentUrl(url);
     window.open(url, "_blank", "noopener,noreferrer");

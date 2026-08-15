@@ -13,6 +13,7 @@ import {
   formatPhoneInput,
   isValidPhone,
 } from "@/lib/lead";
+import { useStore } from "@/components/layout/StoreProvider";
 
 const subjects = [
   "Quero saber sobre um veículo do estoque",
@@ -25,6 +26,7 @@ const subjects = [
 type Errors = Partial<Record<"name" | "phone" | "subject" | "consent", string>>;
 
 export function ContactForm() {
+  const store = useStore();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [subject, setSubject] = useState("");
@@ -55,7 +57,7 @@ export function ContactForm() {
         { label: "Assunto", value: subject },
         { label: "Mensagem", value: message },
       ],
-    });
+    }, store.whatsapp);
 
     setSentUrl(url);
     window.open(url, "_blank", "noopener,noreferrer");
