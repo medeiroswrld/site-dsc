@@ -18,6 +18,8 @@ export interface DepthCarouselProps<T extends DepthCarouselItem = DepthCarouselI
   tint?: string;
   depth?: number;
   spread?: number;
+  /** Room kept beside the fan before the stage is scaled down to fit. */
+  fitPadding?: number;
   tilt?: number;
   tiltDirection?: "left" | "right";
   perspective?: number;

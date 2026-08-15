@@ -29,6 +29,9 @@ const DepthCarousel = ({
   tint = '#05060a',
   depth = 220,
   spread = 90,
+  // LOCAL: room reserved beside the fan before the whole stage is scaled
+  // down to fit. Generous on a desktop, nearly nothing on a phone.
+  fitPadding = 120,
   tilt = 22,
   tiltDirection = 'right',
   perspective = 1400,
@@ -79,6 +82,7 @@ const DepthCarousel = ({
     count,
     depth,
     spread,
+    fitPadding,
     tilt,
     tiltDirection,
     visibleCards,
@@ -194,7 +198,7 @@ const DepthCarousel = ({
     const ro = new ResizeObserver(entries => {
       const w = entries[0].contentRect.width;
       const cfg = cfgRef.current;
-      const needed = cfg.cardWidth + Math.abs(cfg.spread) * 2 + 120;
+      const needed = cfg.cardWidth + Math.abs(cfg.spread) * 2 + cfg.fitPadding;
       scaleRef.current = clamp(w / needed, 0.4, 1);
       layout(posRef.current);
     });
