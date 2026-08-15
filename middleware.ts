@@ -55,6 +55,7 @@ export const config = {
   matcher: [
     "/admin",
     "/admin/veiculos/:path*",
+    "/admin/conteudo",
     "/admin/instagram",
     "/admin/senha",
   ],
