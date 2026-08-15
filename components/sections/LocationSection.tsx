@@ -1,10 +1,14 @@
 import { Reveal } from "@/components/motion/Reveal";
 import { MapPin, Phone, WhatsApp } from "@/components/ui/icons";
 import { Container } from "@/components/ui/Container";
-import { fullAddress, mapsDirectionsUrl, mapsEmbedUrl, siteConfig } from "@/lib/site";
+import { siteConfig } from "@/lib/site";
 import { whatsappVisitLink } from "@/lib/whatsapp";
+import { getStoreInfo } from "@/lib/site-content-repository";
+import { formatAddress, mapsDirections, mapsEmbed } from "@/lib/site-content";
 
-export function LocationSection() {
+export async function LocationSection() {
+  const store = await getStoreInfo();
+
   return (
     <section
       className="bg-surface py-20 lg:py-24"
@@ -25,22 +29,22 @@ export function LocationSection() {
                 <p className="flex gap-3 text-[1.0625rem] leading-relaxed text-fg-muted">
                   <MapPin className="mt-1 shrink-0 text-[1.125rem] text-fg-subtle" />
                   <span>
-                    {siteConfig.address.street}
+                    {store.street}
                     <br />
-                    {siteConfig.address.neighbourhood}
+                    {store.neighbourhood}
                     <br />
-                    {siteConfig.address.city} - {siteConfig.address.state},{" "}
-                    {siteConfig.address.postalCode}
+                    {store.city} - {store.state},{" "}
+                    {store.postalCode}
                   </span>
                 </p>
 
                 <p className="mt-3 flex items-center gap-3">
                   <Phone className="shrink-0 text-[1.125rem] text-fg-subtle" />
                   <a
-                    href={`tel:${siteConfig.phone.e164}`}
+                    href={`tel:${store.phoneE164}`}
                     className="plate inline-block py-2 text-[1.0625rem] text-fg underline-offset-4 hover:underline"
                   >
-                    {siteConfig.phone.display}
+                    {store.phoneDisplay}
                   </a>
                 </p>
               </address>
@@ -48,7 +52,7 @@ export function LocationSection() {
 
             <Reveal delay={0.1}>
               <dl className="mt-7 border-t border-line">
-                {siteConfig.hours.map((entry) => (
+                {store.hours.map((entry) => (
                   <div
                     key={entry.days}
                     className="flex items-baseline justify-between gap-6 border-b border-line py-3"
@@ -65,7 +69,7 @@ export function LocationSection() {
             <Reveal delay={0.14}>
               <div className="mt-8 flex flex-wrap gap-3">
                 <a
-                  href={mapsDirectionsUrl}
+                  href={mapsDirections(store)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-primary btn-md"
@@ -73,14 +77,14 @@ export function LocationSection() {
                   Traçar rota
                 </a>
                 <a
-                  href={`tel:${siteConfig.phone.e164}`}
+                  href={`tel:${store.phoneE164}`}
                   className="btn btn-secondary btn-md"
                 >
                   <Phone className="text-[1rem]" />
                   Ligar
                 </a>
                 <a
-                  href={whatsappVisitLink()}
+                  href={whatsappVisitLink(store.whatsapp)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-secondary btn-md"
@@ -95,8 +99,8 @@ export function LocationSection() {
           <Reveal delay={0.08} className="lg:col-span-7">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-line bg-surface-2 sm:aspect-[16/10] lg:aspect-[4/3.2]">
               <iframe
-                src={mapsEmbedUrl}
-                title={`Mapa com a localização da ${siteConfig.name} — ${fullAddress}`}
+                src={mapsEmbed(store)}
+                title={`Mapa com a localização da ${siteConfig.name} — ${formatAddress(store)}`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 allowFullScreen

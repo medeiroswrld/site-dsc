@@ -4,13 +4,15 @@ import { formatPrice, vehicleTitle } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
 import { whatsappVehicleLink } from "@/lib/whatsapp";
 import type { Vehicle } from "@/types/vehicle";
+import { getStoreInfo } from "@/lib/site-content-repository";
 
 /**
  * The purchase panel. Its copy changes with the vehicle's status so a sold car
  * never shows a buy button, and a reserved one says so before the visitor
  * writes a message.
  */
-export function VehicleContactCTA({ vehicle }: { vehicle: Vehicle }) {
+export async function VehicleContactCTA({ vehicle }: { vehicle: Vehicle }) {
+  const store = await getStoreInfo();
   const sold = vehicle.status === "sold";
   const reserved = vehicle.status === "reserved";
 
@@ -45,7 +47,7 @@ export function VehicleContactCTA({ vehicle }: { vehicle: Vehicle }) {
               Ver veículos disponíveis
             </Link>
             <a
-              href={whatsappVehicleLink(vehicle)}
+              href={whatsappVehicleLink(vehicle, store.whatsapp)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary btn-lg w-full"
@@ -66,7 +68,7 @@ export function VehicleContactCTA({ vehicle }: { vehicle: Vehicle }) {
 
           <div className="mt-6 space-y-3">
             <a
-              href={whatsappVehicleLink(vehicle)}
+              href={whatsappVehicleLink(vehicle, store.whatsapp)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-primary btn-lg w-full"
@@ -94,18 +96,18 @@ export function VehicleContactCTA({ vehicle }: { vehicle: Vehicle }) {
 
       <div className="mt-6 space-y-2.5 border-t border-line pt-6">
         <a
-          href={`tel:${siteConfig.phone.e164}`}
+          href={`tel:${store.phoneE164}`}
           className="-my-1 flex items-center gap-2.5 py-1.5 text-[0.9375rem] text-fg"
         >
           <Phone className="shrink-0 text-[1.0625rem] text-fg-subtle" />
           <span className="plate underline-offset-4 hover:underline">
-            {siteConfig.phone.display}
+            {store.phoneDisplay}
           </span>
         </a>
         <p className="text-[0.8125rem] leading-relaxed text-fg-subtle">
-          {siteConfig.address.street} · {siteConfig.address.neighbourhood}
+          {store.street} · {store.neighbourhood}
           <br />
-          {siteConfig.address.city} - {siteConfig.address.state}
+          {store.city} - {store.state}
         </p>
       </div>
 

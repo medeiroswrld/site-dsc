@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { UnderlineLink } from "@/components/ui/UnderlineLink";
 import { getInstagramPosts } from "@/lib/instagram-repository";
 import { siteConfig } from "@/lib/site";
+import { getStoreInfo } from "@/lib/site-content-repository";
 
 /**
  * Proof that the shop is active, without an embed.
@@ -15,7 +16,7 @@ import { siteConfig } from "@/lib/site";
  * the site.
  */
 export async function InstagramSection() {
-  const posts = await getInstagramPosts();
+  const [posts, store] = await Promise.all([getInstagramPosts(), getStoreInfo()]);
   if (!posts.length) return null;
 
   return (
@@ -30,11 +31,11 @@ export async function InstagramSection() {
           </div>
 
           <UnderlineLink
-            href={siteConfig.instagram.url}
+            href={store.instagramUrl}
             external
             leading={<Instagram className="text-[1.0625rem]" />}
           >
-            {siteConfig.instagram.handle}
+            {store.instagramHandle}
           </UnderlineLink>
         </Reveal>
 

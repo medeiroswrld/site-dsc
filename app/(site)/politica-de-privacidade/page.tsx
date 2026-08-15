@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Container } from "@/components/ui/Container";
-import { fullAddress, siteConfig } from "@/lib/site";
+import { siteConfig } from "@/lib/site";
+import { getStoreInfo } from "@/lib/site-content-repository";
+import { formatAddress } from "@/lib/site-content";
 
 export const metadata: Metadata = {
   title: "Política de Privacidade",
@@ -61,7 +63,8 @@ const sections = [
   },
 ];
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const store = await getStoreInfo();
   return (
     <>
       <PageHeader
@@ -98,13 +101,13 @@ export default function PrivacyPolicyPage() {
             <address className="mt-3 not-italic text-[1.0625rem] leading-relaxed text-fg-muted">
               {siteConfig.name}
               <br />
-              {fullAddress}
+              {formatAddress(store)}
               <br />
               <a
-                href={`tel:${siteConfig.phone.e164}`}
+                href={`tel:${store.phoneE164}`}
                 className="plate underline-offset-4 hover:underline"
               >
-                {siteConfig.phone.display}
+                {store.phoneDisplay}
               </a>
             </address>
 

@@ -8,6 +8,7 @@ import { Close, Instagram, MapPin, Phone, WhatsApp } from "@/components/ui/icons
 import { navigation, siteConfig } from "@/lib/site";
 import { whatsappGeneralLink } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
+import { useStore } from "@/components/layout/StoreProvider";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -18,6 +19,7 @@ interface MobileMenuProps {
 }
 
 export function MobileMenu({ open, onClose, pathname }: MobileMenuProps) {
+  const store = useStore();
   const reduced = useReducedMotion();
 
   // Escape closes; the page behind must not scroll while the panel is open.
@@ -116,7 +118,7 @@ export function MobileMenu({ open, onClose, pathname }: MobileMenuProps) {
                 transition={{ duration: 0.3, delay: reduced ? 0 : 0.26 }}
               >
                 <a
-                  href={whatsappGeneralLink()}
+                  href={whatsappGeneralLink(undefined, store.whatsapp)}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={onClose}
@@ -128,14 +130,14 @@ export function MobileMenu({ open, onClose, pathname }: MobileMenuProps) {
 
                 <div className="grid grid-cols-2 gap-3">
                   <a
-                    href={`tel:${siteConfig.phone.e164}`}
+                    href={`tel:${store.phoneE164}`}
                     className="flex items-center justify-center gap-2 rounded-full border border-line px-4 py-3.5 text-[0.875rem] text-fg/85"
                   >
                     <Phone className="text-[1rem]" />
                     Ligar
                   </a>
                   <a
-                    href={siteConfig.instagram.url}
+                    href={store.instagramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-2 rounded-full border border-line px-4 py-3.5 text-[0.875rem] text-fg/85"
@@ -154,10 +156,10 @@ export function MobileMenu({ open, onClose, pathname }: MobileMenuProps) {
               >
                 <MapPin className="mt-0.5 shrink-0 text-[1rem] text-fg-subtle" />
                 <span className="text-[0.8125rem] leading-relaxed text-fg-subtle">
-                  {siteConfig.address.street}
+                  {store.street}
                   <br />
-                  {siteConfig.address.neighbourhood} ·{" "}
-                  {siteConfig.address.city} - {siteConfig.address.state}
+                  {store.neighbourhood} ·{" "}
+                  {store.city} - {store.state}
                 </span>
               </motion.address>
             </nav>

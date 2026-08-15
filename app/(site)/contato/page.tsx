@@ -9,38 +9,48 @@ import { Instagram, Phone, WhatsApp } from "@/components/ui/icons";
 import { breadcrumbSchema } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 import { whatsappGeneralLink } from "@/lib/whatsapp";
+import { getStoreInfo } from "@/lib/site-content-repository";
+import { formatAddress, type StoreInfo } from "@/lib/site-content";
 
-export const metadata: Metadata = {
-  title: "Contato e localização",
-  description: `Fale com a ${siteConfig.name} em ${siteConfig.city} - ${siteConfig.state}. Endereço, telefone ${siteConfig.phone.display}, WhatsApp e horários de atendimento.`,
-  alternates: { canonical: "/contato" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const store = await getStoreInfo();
+  const channels = buildChannels(store);
+  return {
+    title: "Contato e localização",
+    description: `Fale com a ${siteConfig.name} em ${siteConfig.city} - ${siteConfig.state}. Endereço, telefone ${store.phoneDisplay}, WhatsApp e horários de atendimento.`,
+    alternates: { canonical: "/contato" },
+  };
+}
 
-const channels = [
+function buildChannels(store: StoreInfo) {
+  return [
   {
     label: "WhatsApp",
     value: "Resposta mais rápida",
-    href: whatsappGeneralLink("página de contato"),
+    href: whatsappGeneralLink("página de contato", store.whatsapp),
     Icon: WhatsApp,
     external: true,
   },
   {
     label: "Telefone",
-    value: siteConfig.phone.display,
-    href: `tel:${siteConfig.phone.e164}`,
+    value: store.phoneDisplay,
+    href: `tel:${store.phoneE164}`,
     Icon: Phone,
     external: false,
   },
   {
     label: "Instagram",
-    value: siteConfig.instagram.handle,
-    href: siteConfig.instagram.url,
+    value: store.instagramHandle,
+    href: store.instagramUrl,
     Icon: Instagram,
     external: true,
   },
-];
+  ];
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const store = await getStoreInfo();
+  const channels = buildChannels(store);
   return (
     <>
       <PageHeader
@@ -94,7 +104,7 @@ export default function ContactPage() {
                 Horários de atendimento
               </h2>
               <dl className="mt-5 border-t border-line">
-                {siteConfig.hours.map((entry) => (
+                {store.hours.map((entry) => (
                   <div
                     key={entry.days}
                     className="flex items-baseline justify-between gap-6 border-b border-line py-3.5"

@@ -5,6 +5,8 @@ import { Container } from "@/components/ui/Container";
 import { UnderlineLink } from "@/components/ui/UnderlineLink";
 import { formatRating } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
+import { getStoreInfo } from "@/lib/site-content-repository";
+import { formatAddress, mapsDirections, mapsEmbed } from "@/lib/site-content";
 
 /**
  * Reviews quoted verbatim from what the store supplied. Reviewer names were
@@ -17,8 +19,11 @@ const quotes = [
   "Equipe atenciosa, transparente e muito profissional.",
 ];
 
-export function GoogleRating() {
-  const { value, count, scale } = siteConfig.rating;
+export async function GoogleRating() {
+  const store = await getStoreInfo();
+
+  const { ratingValue: value, ratingCount: count } = store;
+  const scale = siteConfig.rating.scale;
 
   return (
     <section className="bg-surface py-16 lg:py-20" aria-labelledby="reputacao-titulo">
@@ -54,7 +59,7 @@ export function GoogleRating() {
             </p>
 
             <UnderlineLink
-              href={siteConfig.googleReviewsUrl}
+              href={store.googleReviewsUrl}
               external
               className="mt-4"
             >

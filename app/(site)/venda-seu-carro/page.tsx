@@ -7,6 +7,8 @@ import { Container } from "@/components/ui/Container";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { breadcrumbSchema } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
+import { isVectorSource } from "@/lib/image";
+import { getSiteMedia } from "@/lib/site-content-repository";
 
 export const metadata: Metadata = {
   title: "Venda ou troque seu carro",
@@ -14,7 +16,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/venda-seu-carro" },
 };
 
-export default function SellCarPage() {
+export default async function SellCarPage() {
+  const media = await getSiteMedia();
+
   return (
     <>
       <PageHeader
@@ -31,13 +35,11 @@ export default function SellCarPage() {
 
           <div className="lg:col-span-5 xl:col-span-4 xl:col-start-9">
             <MediaReveal className="relative aspect-[4/3] rounded-2xl bg-surface-2">
-              {/* ASSET NEEDED: photograph of a vehicle being appraised at the
-                  store, or of the pátio. */}
               <Image
-                src="/placeholders/store-front.svg"
-                alt="Espaço reservado para uma foto da loja D.S.C. Seminovos"
+                src={media.store_front.src}
+                alt={media.store_front.alt}
                 fill
-                unoptimized
+                unoptimized={media.store_front.isPlaceholder || isVectorSource(media.store_front.src)}
                 sizes="(min-width: 1024px) 33vw, 92vw"
                 className="object-cover"
               />

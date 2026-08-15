@@ -1,4 +1,6 @@
 import Image from "next/image";
+import type { ResolvedMedia } from "@/lib/site-content";
+import { isVectorSource } from "@/lib/image";
 import { MediaReveal, Reveal } from "@/components/motion/Reveal";
 import { Container } from "@/components/ui/Container";
 import { UnderlineLink } from "@/components/ui/UnderlineLink";
@@ -14,18 +16,17 @@ const facts = [
   { label: "Loja física", value: `${siteConfig.city} - ${siteConfig.state}` },
 ];
 
-export function AboutSection() {
+export function AboutSection({ facade }: { facade: ResolvedMedia }) {
   return (
     <section className="bg-bg py-20 lg:py-28" aria-labelledby="sobre-titulo">
       <Container size="wide">
         <div className="grid items-start gap-10 lg:grid-cols-12 lg:gap-14">
           <MediaReveal className="relative aspect-[4/3] rounded-2xl bg-surface-2 lg:col-span-7 lg:aspect-[4/3.1]">
-            {/* ASSET NEEDED: photograph of the D.S.C. storefront. */}
             <Image
-              src="/placeholders/facade.svg"
-              alt="Espaço reservado para a foto da fachada da loja D.S.C. Seminovos"
+              src={facade.src}
+              alt={facade.alt}
+              unoptimized={facade.isPlaceholder || isVectorSource(facade.src)}
               fill
-              unoptimized
               sizes="(min-width: 1024px) 58vw, 92vw"
               className="object-cover"
             />

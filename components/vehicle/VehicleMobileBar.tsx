@@ -9,6 +9,7 @@ import { whatsappVehicleLink } from "@/lib/whatsapp";
 import type { Vehicle } from "@/types/vehicle";
 
 import { reducedFade, spring } from "@/lib/motion";
+import { useStore } from "@/components/layout/StoreProvider";
 
 /**
  * Contextual action bar for small screens. It appears once the gallery has
@@ -16,6 +17,7 @@ import { reducedFade, spring } from "@/lib/motion";
  * it carries the price so the decision and the action sit together.
  */
 export function VehicleMobileBar({ vehicle }: { vehicle: Vehicle }) {
+  const store = useStore();
   const reduced = useReducedMotion();
   const [visible, setVisible] = useState(false);
 
@@ -49,15 +51,15 @@ export function VehicleMobileBar({ vehicle }: { vehicle: Vehicle }) {
             </div>
 
             <a
-              href={`tel:${siteConfig.phone.e164}`}
-              aria-label={`Ligar para ${siteConfig.phone.display}`}
+              href={`tel:${store.phoneE164}`}
+              aria-label={`Ligar para ${store.phoneDisplay}`}
               className="ms-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-control text-fg"
             >
               <Phone className="text-[1.125rem]" />
             </a>
 
             <a
-              href={whatsappVehicleLink(vehicle)}
+              href={whatsappVehicleLink(vehicle, store.whatsapp)}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-primary h-12 shrink-0 px-5 text-[0.875rem]"

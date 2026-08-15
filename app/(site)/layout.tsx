@@ -5,6 +5,8 @@ import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { autoDealerSchema, websiteSchema } from "@/lib/seo";
+import { StoreProvider } from "@/components/layout/StoreProvider";
+import { getStoreInfo } from "@/lib/site-content-repository";
 import { siteConfig } from "@/lib/site";
 import "../globals.css";
 
@@ -68,9 +70,13 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // Resolved once here and shared: every header, footer and floating button on
+  // the page reads the same numbers, and the database is touched once.
+  const store = await getStoreInfo();
+
   return (
     <html
       lang="pt-BR"
@@ -84,12 +90,14 @@ export default function RootLayout({
           Ir para o conteúdo
         </a>
 
-        <Header />
-        <main id="conteudo">{children}</main>
-        <Footer />
-        <WhatsAppButton />
+        <StoreProvider store={store}>
+          <Header />
+          <main id="conteudo">{children}</main>
+          <Footer />
+          <WhatsAppButton />
+        </StoreProvider>
 
-        <JsonLd data={autoDealerSchema()} />
+        <JsonLd data={autoDealerSchema(store)} />
         <JsonLd data={websiteSchema()} />
       </body>
     </html>

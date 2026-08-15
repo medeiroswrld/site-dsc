@@ -3,6 +3,7 @@
 import DepthCarousel from "@/components/reactbits/DepthCarousel";
 import type { InstagramPost } from "@/lib/instagram-repository";
 import { siteConfig } from "@/lib/site";
+import { useStore } from "@/components/layout/StoreProvider";
 
 /**
  * Client wrapper around the React Bits carousel.
@@ -12,6 +13,7 @@ import { siteConfig } from "@/lib/site";
  * scrolling past this section does not get trapped cycling slides.
  */
 export function InstagramCarousel({ posts }: { posts: InstagramPost[] }) {
+  const store = useStore();
   return (
     // The stack fans to the right and its scale only shrinks so far, so on a
     // narrow phone the rearmost cards run past the viewport. Clipping here
@@ -45,7 +47,7 @@ export function InstagramCarousel({ posts }: { posts: InstagramPost[] }) {
         wheelNavigation={false}
         onItemActivate={(_index: number, item: InstagramPost) => {
           window.open(
-            item?.href ?? siteConfig.instagram.url,
+            item?.href ?? store.instagramUrl,
             "_blank",
             "noopener,noreferrer",
           );

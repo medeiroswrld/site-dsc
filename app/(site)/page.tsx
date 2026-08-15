@@ -11,6 +11,7 @@ import { WorkshopSection } from "@/components/sections/WorkshopSection";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { itemListSchema } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
+import { getSiteMedia } from "@/lib/site-content-repository";
 import { getFeaturedVehicles } from "@/lib/vehicles-repository";
 
 export const metadata: Metadata = {
@@ -20,14 +21,21 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const featured = await getFeaturedVehicles(6);
+  const [featured, media] = await Promise.all([
+    getFeaturedVehicles(6),
+    getSiteMedia(),
+  ]);
+
+  // A slot with nothing uploaded still carries its stand-in drawing; only the
+  // film is genuinely optional, so it is the one that can be null.
+  const heroFilm = media.hero_video.isPlaceholder ? null : media.hero_video;
 
   return (
     <>
-      <HeroVideo />
+      <HeroVideo poster={media.hero_poster} video={heroFilm} />
       <FeaturedVehicles vehicles={featured} />
-      <AboutSection />
-      <WorkshopSection />
+      <AboutSection facade={media.facade} />
+      <WorkshopSection workshop={media.workshop} detail={media.workshop_detail} />
       <Showroom360 />
       <GoogleRating />
       <InstagramSection />

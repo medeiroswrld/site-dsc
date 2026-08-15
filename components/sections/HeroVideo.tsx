@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import type { ResolvedMedia } from "@/lib/site-content";
+import { isVectorSource } from "@/lib/image";
 import { useEffect, useRef, useState } from "react";
 import {
   motion,
@@ -11,8 +13,9 @@ import {
 import { Play, WhatsApp } from "@/components/ui/icons";
 import { Container } from "@/components/ui/Container";
 import FoldText from "@/components/reactbits/FoldText";
-import { media, siteConfig } from "@/lib/site";
+import { siteConfig } from "@/lib/site";
 import { whatsappGeneralLink } from "@/lib/whatsapp";
+import { useStore } from "@/components/layout/StoreProvider";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -26,7 +29,16 @@ const EASE = [0.22, 1, 0.36, 1] as const;
  * <video> element removes itself the moment the source fails to load — no
  * broken frame, no layout shift.
  */
-export function HeroVideo() {
+export function HeroVideo({
+  poster,
+  video,
+}: {
+  /** Still frame behind the headline. Always present. */
+  poster: ResolvedMedia;
+  /** The store film, when one has been uploaded. */
+  video: ResolvedMedia | null;
+}) {
+  const store = useStore();
   const sectionRef = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
 
@@ -39,7 +51,7 @@ export function HeroVideo() {
 
   const shouldAutoplay = !reduced;
   const showVideo =
-    media.hasHeroVideo && (shouldAutoplay || manualPlay) && !videoFailed;
+    Boolean(video) && (shouldAutoplay || manualPlay) && !videoFailed;
 
   useEffect(() => {
     const id = window.requestAnimationFrame(() => setVideoReady(true));
@@ -84,11 +96,11 @@ export function HeroVideo() {
         }
       >
         <Image
-          src={media.heroPoster}
+          src={poster.src}
           alt=""
           fill
           priority
-          unoptimized
+          unoptimized={poster.isPlaceholder || isVectorSource(poster.src)}
           sizes="100vw"
           className="object-cover"
         />
@@ -101,13 +113,12 @@ export function HeroVideo() {
             loop
             playsInline
             preload="auto"
-            poster={media.heroPoster}
+            poster={poster.src}
             onError={() => setVideoFailed(true)}
             aria-hidden="true"
             tabIndex={-1}
           >
-            <source src={media.heroVideoWebm} type="video/webm" />
-            <source src={media.heroVideo} type="video/mp4" />
+            {video && <source src={video.src} />}
           </video>
         )}
       </motion.div>
@@ -167,7 +178,7 @@ export function HeroVideo() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: EASE, delay: reduced ? 0 : 0.5 }}
             >
-              Há {siteConfig.foundedYearsText}, a D.S.C. atende{" "}
+              Há {store.foundedYearsText}, a D.S.C. atende{" "}
               {siteConfig.city} e região com seminovos selecionados,
               financiamento e atendimento direto da equipe.
             </motion.p>
@@ -198,7 +209,7 @@ export function HeroVideo() {
 
             {/* Only offered when the visitor has asked for less motion — the
                 film then waits for an explicit decision instead of looping. */}
-            {media.hasHeroVideo && reduced && !manualPlay && !videoFailed && (
+            {Boolean(video) && reduced && !manualPlay && !videoFailed && (
               <button
                 type="button"
                 onClick={() => setManualPlay(true)}

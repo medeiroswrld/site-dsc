@@ -7,6 +7,7 @@ import { WhatsApp } from "@/components/ui/icons";
 import { whatsappGeneralLink } from "@/lib/whatsapp";
 
 import { reducedFade, spring } from "@/lib/motion";
+import { useStore } from "@/components/layout/StoreProvider";
 
 /**
  * Floating contact affordance. It stays out of the way until the visitor has
@@ -14,6 +15,7 @@ import { reducedFade, spring } from "@/lib/motion";
  * contextual bar already carries the same action with the car's name attached.
  */
 export function WhatsAppButton() {
+  const store = useStore();
   const pathname = usePathname();
   const reduced = useReducedMotion();
   const [visible, setVisible] = useState(false);
@@ -33,7 +35,7 @@ export function WhatsAppButton() {
     <AnimatePresence>
       {show && (
         <motion.a
-          href={whatsappGeneralLink()}
+          href={whatsappGeneralLink(undefined, store.whatsapp)}
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn-primary fixed bottom-5 right-5 z-40 h-12 pl-4 pr-5 shadow-[0_6px_24px_rgba(0,0,0,0.5)] sm:bottom-7 sm:right-7"

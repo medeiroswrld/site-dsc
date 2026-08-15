@@ -3,8 +3,12 @@ import { Wordmark } from "@/components/layout/Wordmark";
 import { Container } from "@/components/ui/Container";
 import { Instagram } from "@/components/ui/icons";
 import { navigation, siteConfig } from "@/lib/site";
+import { getStoreInfo } from "@/lib/site-content-repository";
+import { formatAddress, mapsDirections, mapsEmbed } from "@/lib/site-content";
 
-export function Footer() {
+export async function Footer() {
+  const store = await getStoreInfo();
+
   const year = new Date().getFullYear();
 
   return (
@@ -44,19 +48,19 @@ export function Footer() {
             </h2>
             <address className="mt-5 space-y-3 not-italic">
               <p className="text-[0.9375rem] leading-relaxed text-fg-muted">
-                {siteConfig.address.street}
+                {store.street}
                 <br />
-                {siteConfig.address.neighbourhood}
+                {store.neighbourhood}
                 <br />
-                {siteConfig.address.city} - {siteConfig.address.state},{" "}
-                {siteConfig.address.postalCode}
+                {store.city} - {store.state},{" "}
+                {store.postalCode}
               </p>
               <p>
                 <a
-                  href={`tel:${siteConfig.phone.e164}`}
+                  href={`tel:${store.phoneE164}`}
                   className="plate inline-block py-2 text-[0.9375rem] text-fg transition-opacity duration-200 hover:opacity-70"
                 >
-                  {siteConfig.phone.display}
+                  {store.phoneDisplay}
                 </a>
               </p>
             </address>
@@ -65,7 +69,7 @@ export function Footer() {
               <dt className="plate text-[0.625rem] uppercase tracking-[0.16em] text-fg-subtle">
                 Horários
               </dt>
-              {siteConfig.hours.map((entry) => (
+              {store.hours.map((entry) => (
                 <dd
                   key={entry.days}
                   className="flex flex-wrap gap-x-2 text-[0.8125rem] text-fg-muted"
@@ -82,13 +86,13 @@ export function Footer() {
               Instagram
             </h2>
             <a
-              href={siteConfig.instagram.url}
+              href={store.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="group mt-3 inline-flex items-center gap-2 py-2 text-[0.9375rem] text-fg-muted transition-colors duration-200 hover:text-fg"
             >
               <Instagram className="text-[1.125rem]" />
-              {siteConfig.instagram.handle}
+              {store.instagramHandle}
             </a>
           </div>
         </div>

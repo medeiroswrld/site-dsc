@@ -1,5 +1,6 @@
 import { formatYear, vehicleTitle } from "@/lib/format";
 import { siteConfig } from "@/lib/site";
+import { STORE_DEFAULTS, type StoreInfo } from "@/lib/site-content";
 import type { Vehicle } from "@/types/vehicle";
 
 /**
@@ -7,18 +8,26 @@ import type { Vehicle } from "@/types/vehicle";
  * from real vehicle records — nothing is fabricated for SEO purposes.
  */
 
-const postalAddress = {
-  "@type": "PostalAddress",
-  streetAddress: siteConfig.address.street,
-  addressLocality: siteConfig.address.city,
-  addressRegion: siteConfig.address.state,
-  postalCode: siteConfig.address.postalCode,
-  addressCountry: siteConfig.address.country,
-} as const;
+function postalAddress(store: StoreInfo) {
+  return {
+    "@type": "PostalAddress",
+    streetAddress: store.street,
+    addressLocality: store.city,
+    addressRegion: store.state,
+    postalCode: store.postalCode,
+    addressCountry: siteConfig.address.country,
+  };
+}
 
 export const dealerId = `${siteConfig.url}/#autodealer`;
 
-export function autoDealerSchema() {
+/**
+ * The block Google reads to show the shop in search and on the map.
+ *
+ * It takes the store data rather than importing it, so the phone number and
+ * rating in the markup can never disagree with the ones on the page.
+ */
+export function autoDealerSchema(store: StoreInfo = STORE_DEFAULTS) {
   return {
     "@context": "https://schema.org",
     "@type": "AutoDealer",
@@ -26,8 +35,8 @@ export function autoDealerSchema() {
     name: siteConfig.name,
     description: siteConfig.description,
     url: siteConfig.url,
-    telephone: siteConfig.phone.e164,
-    address: postalAddress,
+    telephone: store.phoneE164,
+    address: postalAddress(store),
     geo: {
       "@type": "GeoCoordinates",
       latitude: siteConfig.geo.latitude,
@@ -37,13 +46,13 @@ export function autoDealerSchema() {
       "@type": "City",
       name: `${siteConfig.city}, ${siteConfig.stateName}`,
     },
-    sameAs: [siteConfig.instagram.url],
+    sameAs: [store.instagramUrl],
     priceRange: "$$",
     // Reported by the business; kept in one place so it is never invented.
     aggregateRating: {
       "@type": "AggregateRating",
-      ratingValue: siteConfig.rating.value,
-      reviewCount: siteConfig.rating.count,
+      ratingValue: store.ratingValue,
+      reviewCount: store.ratingCount,
       bestRating: siteConfig.rating.scale,
     },
     openingHoursSpecification: [

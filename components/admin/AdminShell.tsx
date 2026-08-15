@@ -42,6 +42,12 @@ export function AdminShell({
               Estoque
             </Link>
             <Link
+              href="/admin/conteudo"
+              className="px-3 py-2 text-[0.8125rem] text-fg-subtle transition-colors hover:text-fg"
+            >
+              Site
+            </Link>
+            <Link
               href="/admin/instagram"
               className="px-3 py-2 text-[0.8125rem] text-fg-subtle transition-colors hover:text-fg"
             >

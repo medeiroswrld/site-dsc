@@ -1,4 +1,6 @@
 import Image from "next/image";
+import type { ResolvedMedia } from "@/lib/site-content";
+import { isVectorSource } from "@/lib/image";
 import { MediaReveal, Reveal } from "@/components/motion/Reveal";
 import { Container } from "@/components/ui/Container";
 
@@ -7,7 +9,13 @@ import { Container } from "@/components/ui/Container";
  * own dark chapter rather than a bullet in a feature list. Deliberately makes
  * no claim about inspections, checklists or warranties — none were confirmed.
  */
-export function WorkshopSection() {
+export function WorkshopSection({
+  workshop,
+  detail,
+}: {
+  workshop: ResolvedMedia;
+  detail: ResolvedMedia;
+}) {
   return (
     <section
       className="bg-surface py-20 lg:py-28"
@@ -37,12 +45,11 @@ export function WorkshopSection() {
 
           <div className="grid grid-cols-5 gap-4 lg:col-span-7 lg:gap-5">
             <MediaReveal className="relative col-span-3 aspect-[4/3.4] rounded-2xl bg-surface-2">
-              {/* ASSET NEEDED: photograph of the D.S.C. workshop. */}
               <Image
-                src="/placeholders/workshop.svg"
-                alt="Espaço reservado para a foto da oficina própria da D.S.C."
+                src={workshop.src}
+                alt={workshop.alt}
+                unoptimized={workshop.isPlaceholder || isVectorSource(workshop.src)}
                 fill
-                unoptimized
                 sizes="(min-width: 1024px) 35vw, 55vw"
                 className="object-cover"
               />
@@ -52,12 +59,11 @@ export function WorkshopSection() {
               delay={0.1}
               className="relative col-span-2 mt-10 aspect-[3/4.2] rounded-2xl bg-surface-2 lg:mt-16"
             >
-              {/* ASSET NEEDED: detail shot from inside the workshop. */}
               <Image
-                src="/placeholders/workshop-detail.svg"
-                alt="Espaço reservado para uma foto de detalhe da oficina da D.S.C."
+                src={detail.src}
+                alt={detail.alt}
+                unoptimized={detail.isPlaceholder || isVectorSource(detail.src)}
                 fill
-                unoptimized
                 sizes="(min-width: 1024px) 23vw, 37vw"
                 className="object-cover"
               />
