@@ -3,6 +3,8 @@ import { cache } from "react";
 import { vehicles as demoVehicles } from "@/data/vehicles";
 import { isSupabaseConfigured, photoUrl } from "@/lib/supabase/config";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
+import { logger } from "@/lib/logger";
+import type { StockFacets } from "@/lib/vehicle-filters";
 import type { VehicleRowWithImages } from "@/lib/supabase/types";
 import type {
   Vehicle,
@@ -25,8 +27,6 @@ const SELECT = `
   vehicle_images ( id, vehicle_id, path, alt, position, width, height )
 `;
 
-/** Newly arrived if it entered stock within this many days. */
-const RECENT_ARRIVAL_DAYS = 21;
 
 function rowToVehicle(row: VehicleRowWithImages): Vehicle {
   const images = [...(row.vehicle_images ?? [])]
@@ -111,7 +111,7 @@ const loadVehicles = unstable_cache(
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("[estoque] falha ao ler veículos:", error.message);
+      logger.error("estoque.read_failed", { err: error });
       return [];
     }
 
@@ -176,30 +176,11 @@ export async function getRelatedVehicles(
     .map((entry) => entry.candidate);
 }
 
-export function isRecentArrival(vehicle: Vehicle, now = new Date()): boolean {
-  if (vehicle.status !== "available") return false;
-  const added = new Date(vehicle.createdAt).getTime();
-  if (Number.isNaN(added)) return false;
-  const days = (now.getTime() - added) / 86_400_000;
-  return days >= 0 && days <= RECENT_ARRIVAL_DAYS;
-}
 
 /* -------------------------------------------------------------------------- */
 /*  Facets — the option lists the filter UI renders from                       */
 /* -------------------------------------------------------------------------- */
 
-export interface StockFacets {
-  brands: string[];
-  modelsByBrand: Record<string, string[]>;
-  bodyTypes: string[];
-  transmissions: string[];
-  fuels: string[];
-  yearMin: number;
-  yearMax: number;
-  priceMin: number;
-  priceMax: number;
-  mileageMax: number;
-}
 
 const EMPTY_FACETS: StockFacets = {
   brands: [],
@@ -251,105 +232,15 @@ export async function getStockFacets(): Promise<StockFacets> {
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Filtering + sorting — pure, so the client can run them without a round trip */
+/*  Pure logic lives in lib/vehicle-filters.ts so the browser can use it       */
+/*  without dragging this module in. Re-exported for the server-side callers   */
+/*  that already import it from here.                                          */
 /* -------------------------------------------------------------------------- */
-
-export const defaultFilters: VehicleFilterState = {
-  q: "",
-  brand: "",
-  model: "",
-  bodyType: "",
-  transmission: "",
-  fuel: "",
-  yearMin: null,
-  yearMax: null,
-  priceMin: null,
-  priceMax: null,
-  mileageMax: null,
-  sort: "recentes",
-};
-
-/** Strips accents and case so "Sedã" matches a search for "seda". */
-function normalise(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase()
-    .trim();
-}
-
-export function filterVehicles(
-  list: Vehicle[],
-  filters: VehicleFilterState,
-): Vehicle[] {
-  const query = normalise(filters.q);
-  const terms = query ? query.split(/\s+/) : [];
-
-  return list.filter((vehicle) => {
-    if (terms.length) {
-      const haystack = normalise(
-        `${vehicle.brand} ${vehicle.model} ${vehicle.version} ${vehicle.bodyType} ${vehicle.color}`,
-      );
-      if (!terms.every((term) => haystack.includes(term))) return false;
-    }
-
-    if (filters.brand && vehicle.brand !== filters.brand) return false;
-    if (filters.model && vehicle.model !== filters.model) return false;
-    if (filters.bodyType && vehicle.bodyType !== filters.bodyType) return false;
-    if (filters.transmission && vehicle.transmission !== filters.transmission)
-      return false;
-    if (filters.fuel && vehicle.fuel !== filters.fuel) return false;
-
-    if (filters.yearMin !== null && vehicle.yearModel < filters.yearMin)
-      return false;
-    if (filters.yearMax !== null && vehicle.yearModel > filters.yearMax)
-      return false;
-
-    if (filters.priceMin !== null) {
-      if (vehicle.price === null || vehicle.price < filters.priceMin)
-        return false;
-    }
-    if (filters.priceMax !== null) {
-      if (vehicle.price === null || vehicle.price > filters.priceMax)
-        return false;
-    }
-
-    if (filters.mileageMax !== null && vehicle.mileage > filters.mileageMax)
-      return false;
-
-    return true;
-  });
-}
-
-export function sortVehicles(list: Vehicle[], sort: VehicleSort): Vehicle[] {
-  const sorted = [...list];
-
-  // Sold stock always sinks to the bottom, whatever the chosen order.
-  const statusWeight = (vehicle: Vehicle) => (vehicle.status === "sold" ? 1 : 0);
-
-  const comparators: Record<VehicleSort, (a: Vehicle, b: Vehicle) => number> = {
-    recentes: (a, b) => b.createdAt.localeCompare(a.createdAt),
-    "menor-preco": (a, b) =>
-      (a.price ?? Number.POSITIVE_INFINITY) -
-      (b.price ?? Number.POSITIVE_INFINITY),
-    "maior-preco": (a, b) => (b.price ?? -1) - (a.price ?? -1),
-    "menor-km": (a, b) => a.mileage - b.mileage,
-  };
-
-  return sorted.sort(
-    (a, b) => statusWeight(a) - statusWeight(b) || comparators[sort](a, b),
-  );
-}
-
-export function countActiveFilters(filters: VehicleFilterState): number {
-  let count = 0;
-  if (filters.brand) count += 1;
-  if (filters.model) count += 1;
-  if (filters.bodyType) count += 1;
-  if (filters.transmission) count += 1;
-  if (filters.fuel) count += 1;
-  if (filters.yearMin !== null || filters.yearMax !== null) count += 1;
-  if (filters.priceMin !== null || filters.priceMax !== null) count += 1;
-  if (filters.mileageMax !== null) count += 1;
-  return count;
-}
+export type { StockFacets } from "@/lib/vehicle-filters";
+export {
+  isRecentArrival,
+  defaultFilters,
+  filterVehicles,
+  sortVehicles,
+  countActiveFilters,
+} from "@/lib/vehicle-filters";

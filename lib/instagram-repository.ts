@@ -3,6 +3,7 @@ import { cache } from "react";
 import { isSupabaseConfigured, photoUrl } from "@/lib/supabase/config";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { siteConfig } from "@/lib/site";
+import { logger } from "@/lib/logger";
 
 /**
  * The photos shown in the Instagram strip on the home page.
@@ -53,7 +54,7 @@ const loadPosts = unstable_cache(
       // it stays quiet here instead of logging on every page render. Anything
       // else is a real fault and should be seen.
       if (error.code !== "PGRST205") {
-        console.error("[instagram] falha ao ler publicações:", error.message);
+        logger.error("instagram.read_failed", { err: error });
       }
       return [];
     }

@@ -3,6 +3,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/admin/auth";
 import type { ActionResult } from "@/lib/admin/schema";
+import { fail } from "@/lib/admin/action-log";
 import { INSTAGRAM_TAG } from "@/lib/instagram-repository";
 import { PHOTO_BUCKET, STORAGE_EXTENSIONS } from "@/lib/supabase/config";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
@@ -30,15 +31,12 @@ export async function createInstagramUploadTargets(
   await requireAdmin();
 
   if (types.length < 1 || types.length > 20) {
-    return { ok: false, message: "Envie entre 1 e 20 fotos por vez." };
+    return fail("instagram", "Envie entre 1 e 20 fotos por vez.");
   }
 
   const rejected = types.filter((type) => !STORAGE_EXTENSIONS[type]);
   if (rejected.length) {
-    return {
-      ok: false,
-      message: `Formato não aceito: ${[...new Set(rejected)].join(", ")}. Envie JPG, PNG, WebP, AVIF ou SVG.`,
-    };
+    return fail("instagram", `Formato não aceito: ${[...new Set(rejected)].join(", ")}. Envie JPG, PNG, WebP, AVIF ou SVG.`);
   }
 
   const supabase = createSupabaseAdminClient();
@@ -52,7 +50,7 @@ export async function createInstagramUploadTargets(
       .createSignedUploadUrl(path);
 
     if (error || !data) {
-      return { ok: false, message: `Não foi possível preparar o envio: ${error?.message}` };
+      return fail("instagram", `Não foi possível preparar o envio: ${error?.message}`);
     }
     targets.push({ path, token: data.token });
   }
@@ -64,7 +62,7 @@ export async function registerInstagramPosts(
   photos: Array<{ path: string; width: number; height: number }>,
 ): Promise<ActionResult> {
   await requireAdmin();
-  if (!photos.length) return { ok: false, message: "Nenhuma foto para registrar." };
+  if (!photos.length) return fail("instagram", "Nenhuma foto para registrar.");
 
   const supabase = createSupabaseAdminClient();
 
@@ -88,7 +86,7 @@ export async function registerInstagramPosts(
 
   if (error) {
     await supabase.storage.from(PHOTO_BUCKET).remove(photos.map((p) => p.path));
-    return { ok: false, message: `Erro ao registrar: ${error.message}` };
+    return fail("instagram", `Erro ao registrar: ${error.message}`);
   }
 
   refresh();
@@ -114,7 +112,7 @@ export async function setInstagramLink(
 
   const trimmed = url.trim();
   if (trimmed && !/^https?:\/\/(www\.)?instagram\.com\//i.test(trimmed)) {
-    return { ok: false, message: "Cole um endereço que comece com instagram.com" };
+    return fail("instagram", "Cole um endereço que comece com instagram.com");
   }
 
   const supabase = createSupabaseAdminClient();
@@ -123,7 +121,7 @@ export async function setInstagramLink(
     .update({ url: trimmed || null })
     .eq("id", id);
 
-  if (error) return { ok: false, message: error.message };
+  if (error) return fail("instagram", error.message);
 
   refresh();
   return { ok: true, message: "Link salvo." };
@@ -140,7 +138,7 @@ export async function deleteInstagramPost(id: string): Promise<ActionResult> {
     .maybeSingle();
 
   const { error } = await supabase.from("instagram_posts").delete().eq("id", id);
-  if (error) return { ok: false, message: error.message };
+  if (error) return fail("instagram", error.message);
 
   // The row is gone, so the file has nothing pointing at it.
   if (data?.path) {
@@ -162,7 +160,7 @@ export async function reorderInstagramPosts(ids: string[]): Promise<ActionResult
   );
 
   const failed = results.find((result) => result.error);
-  if (failed?.error) return { ok: false, message: failed.error.message };
+  if (failed?.error) return fail("instagram", failed.error.message);
 
   refresh();
   return { ok: true };

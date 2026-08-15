@@ -1,4 +1,4 @@
-import { defaultFilters } from "@/lib/vehicles-repository";
+import { defaultFilters } from "@/lib/vehicle-filters";
 import type { VehicleFilterState, VehicleSort } from "@/types/vehicle";
 
 /**

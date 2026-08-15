@@ -2,6 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/admin/auth";
+import { fail } from "@/lib/admin/action-log";
 import {
   type ActionResult,
   type FieldErrors,
@@ -110,7 +111,7 @@ export async function saveVehicle(
       .update(row)
       .eq("id", vehicleId);
 
-    if (error) return { ok: false, message: `Erro ao salvar: ${error.message}` };
+    if (error) return fail("vehicles", `Erro ao salvar: ${error.message}`);
 
     revalidatePublicPages(slug);
     return { ok: true, message: "Veículo atualizado.", id: vehicleId };
@@ -122,7 +123,7 @@ export async function saveVehicle(
     .select("id")
     .single();
 
-  if (error) return { ok: false, message: `Erro ao cadastrar: ${error.message}` };
+  if (error) return fail("vehicles", `Erro ao cadastrar: ${error.message}`);
 
   revalidatePublicPages(slug);
   return { ok: true, message: "Veículo cadastrado.", id: data.id as string };
@@ -144,7 +145,7 @@ export async function setVehicleStatus(
     .update({ status })
     .eq("id", vehicleId);
 
-  if (error) return { ok: false, message: error.message };
+  if (error) return fail("vehicles", error.message);
 
   revalidatePublicPages();
   return { ok: true };
@@ -162,7 +163,7 @@ export async function setVehicleFeatured(
     .update({ featured })
     .eq("id", vehicleId);
 
-  if (error) return { ok: false, message: error.message };
+  if (error) return fail("vehicles", error.message);
 
   revalidatePublicPages();
   return { ok: true };
@@ -190,7 +191,7 @@ export async function deleteVehicle(vehicleId: string): Promise<ActionResult> {
   }
 
   const { error } = await supabase.from("vehicles").delete().eq("id", vehicleId);
-  if (error) return { ok: false, message: error.message };
+  if (error) return fail("vehicles", error.message);
 
   revalidatePublicPages();
   return { ok: true, message: "Veículo excluído." };
@@ -221,15 +222,12 @@ export async function createUploadTargets(
   await requireAdmin();
 
   if (types.length < 1 || types.length > 40) {
-    return { ok: false, message: "Envie entre 1 e 40 fotos por vez." };
+    return fail("vehicles", "Envie entre 1 e 40 fotos por vez.");
   }
 
   const rejected = types.filter((type) => !STORAGE_EXTENSIONS[type]);
   if (rejected.length) {
-    return {
-      ok: false,
-      message: `Formato não aceito: ${[...new Set(rejected)].join(", ")}. Envie JPG, PNG, WebP, AVIF ou SVG.`,
-    };
+    return fail("vehicles", `Formato não aceito: ${[...new Set(rejected)].join(", ")}. Envie JPG, PNG, WebP, AVIF ou SVG.`);
   }
 
   const supabase = createSupabaseAdminClient();
@@ -246,7 +244,7 @@ export async function createUploadTargets(
       .createSignedUploadUrl(path);
 
     if (error || !data) {
-      return { ok: false, message: `Não foi possível preparar o envio: ${error?.message}` };
+      return fail("vehicles", `Não foi possível preparar o envio: ${error?.message}`);
     }
     targets.push({ path, token: data.token });
   }
@@ -264,7 +262,7 @@ export async function registerPhotos(
   photos: Array<{ path: string; width: number; height: number }>,
 ): Promise<ActionResult> {
   await requireAdmin();
-  if (!photos.length) return { ok: false, message: "Nenhuma foto para registrar." };
+  if (!photos.length) return fail("vehicles", "Nenhuma foto para registrar.");
 
   const supabase = createSupabaseAdminClient();
 
@@ -291,7 +289,7 @@ export async function registerPhotos(
   if (error) {
     // Nothing was recorded, so the uploaded files are orphans — clear them.
     await supabase.storage.from(PHOTO_BUCKET).remove(photos.map((p) => p.path));
-    return { ok: false, message: `Erro ao registrar: ${error.message}` };
+    return fail("vehicles", `Erro ao registrar: ${error.message}`);
   }
 
   revalidatePublicPages();
@@ -329,7 +327,7 @@ export async function deletePhoto(imageId: string): Promise<ActionResult> {
     .delete()
     .eq("id", imageId);
 
-  if (error) return { ok: false, message: error.message };
+  if (error) return fail("vehicles", error.message);
 
   revalidatePublicPages();
   return { ok: true };
@@ -350,7 +348,7 @@ export async function reorderPhotos(
   );
 
   const failed = results.find((result) => result.error);
-  if (failed?.error) return { ok: false, message: failed.error.message };
+  if (failed?.error) return fail("vehicles", failed.error.message);
 
   revalidatePublicPages();
   return { ok: true };

@@ -3,6 +3,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 import { requireAdmin } from "@/lib/admin/auth";
 import type { ActionResult } from "@/lib/admin/schema";
+import { fail } from "@/lib/admin/action-log";
 import { findSlot, STORE_DEFAULTS, type StoreHours } from "@/lib/site-content";
 import { SITE_CONTENT_TAG } from "@/lib/site-content-repository";
 import { PHOTO_BUCKET, STORAGE_EXTENSIONS } from "@/lib/supabase/config";
@@ -40,7 +41,7 @@ export async function createSiteMediaTarget(
   await requireAdmin();
 
   const slot = findSlot(slotId);
-  if (!slot) return { ok: false, message: "Espaço desconhecido." };
+  if (!slot) return fail("content", "Espaço desconhecido.");
 
   const extension =
     slot.kind === "video"
@@ -67,7 +68,7 @@ export async function createSiteMediaTarget(
     .createSignedUploadUrl(path);
 
   if (error || !data) {
-    return { ok: false, message: `Não foi possível preparar o envio: ${error?.message}` };
+    return fail("content", `Não foi possível preparar o envio: ${error?.message}`);
   }
 
   return { ok: true, target: { path, token: data.token } };
@@ -80,7 +81,7 @@ export async function registerSiteMedia(
   await requireAdmin();
 
   const slot = findSlot(slotId);
-  if (!slot) return { ok: false, message: "Espaço desconhecido." };
+  if (!slot) return fail("content", "Espaço desconhecido.");
 
   const supabase = createSupabaseAdminClient();
 
@@ -103,7 +104,7 @@ export async function registerSiteMedia(
     { onConflict: "slot" },
   );
 
-  if (error) return { ok: false, message: `Não foi possível salvar: ${error.message}` };
+  if (error) return fail("content", `Não foi possível salvar: ${error.message}`);
 
   if (previous?.path && previous.path !== file.path) {
     await supabase.storage.from(PHOTO_BUCKET).remove([previous.path]);
@@ -118,7 +119,7 @@ export async function clearSiteMedia(slotId: string): Promise<ActionResult> {
   await requireAdmin();
 
   const slot = findSlot(slotId);
-  if (!slot) return { ok: false, message: "Espaço desconhecido." };
+  if (!slot) return fail("content", "Espaço desconhecido.");
 
   const supabase = createSupabaseAdminClient();
 
@@ -129,7 +130,7 @@ export async function clearSiteMedia(slotId: string): Promise<ActionResult> {
     .maybeSingle();
 
   const { error } = await supabase.from("site_media").delete().eq("slot", slotId);
-  if (error) return { ok: false, message: `Não foi possível remover: ${error.message}` };
+  if (error) return fail("content", `Não foi possível remover: ${error.message}`);
 
   if (previous?.path) {
     await supabase.storage.from(PHOTO_BUCKET).remove([previous.path]);
@@ -183,7 +184,7 @@ export async function saveStoreInfo(formData: FormData): Promise<ActionResult> {
 
   if (Number.isFinite(ratingValue)) {
     if (ratingValue < 0 || ratingValue > 5) {
-      return { ok: false, message: "A nota do Google precisa estar entre 0 e 5." };
+      return fail("content", "A nota do Google precisa estar entre 0 e 5.");
     }
     rows.push({ key: "ratingValue", value: ratingValue });
   }
@@ -205,7 +206,7 @@ export async function saveStoreInfo(formData: FormData): Promise<ActionResult> {
     .from("site_settings")
     .upsert(rows.map((row) => ({ ...row })), { onConflict: "key" });
 
-  if (error) return { ok: false, message: `Não foi possível salvar: ${error.message}` };
+  if (error) return fail("content", `Não foi possível salvar: ${error.message}`);
 
   refresh();
   revalidatePath("/admin/conteudo");

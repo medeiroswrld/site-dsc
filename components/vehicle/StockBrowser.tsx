@@ -18,7 +18,7 @@ import {
   filterVehicles,
   sortVehicles,
   type StockFacets,
-} from "@/lib/vehicles-repository";
+} from "@/lib/vehicle-filters";
 import type { Vehicle, VehicleFilterState, VehicleSort } from "@/types/vehicle";
 
 const EASE = [0.22, 1, 0.36, 1] as const;

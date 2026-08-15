@@ -6,6 +6,7 @@ import {
   type ResolvedMedia,
   type StoreInfo,
 } from "@/lib/site-content";
+import { logger } from "@/lib/logger";
 import { isSupabaseConfigured, photoUrl } from "@/lib/supabase/config";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 
@@ -60,7 +61,13 @@ const loadMedia = unstable_cache(
       .from("site_media")
       .select("slot, path, alt, width, height");
 
-    if (error || !data) return map;
+    if (error) {
+      // Falling back is the right behaviour, but doing it quietly means the
+      // site can serve placeholder art for weeks with nobody the wiser.
+      logger.warn("site_media.read_failed", { err: error, fallback: "defaults" });
+      return map;
+    }
+    if (!data) return map;
 
     for (const row of data as MediaRow[]) {
       // A slot removed from the code but still in the table is ignored rather
@@ -89,7 +96,11 @@ const loadStore = unstable_cache(
       .from("site_settings")
       .select("key, value");
 
-    if (error || !data) return STORE_DEFAULTS;
+    if (error) {
+      logger.warn("site_settings.read_failed", { err: error, fallback: "defaults" });
+      return STORE_DEFAULTS;
+    }
+    if (!data) return STORE_DEFAULTS;
 
     const store: StoreInfo = { ...STORE_DEFAULTS, hours: [...STORE_DEFAULTS.hours] };
 
@@ -112,7 +123,8 @@ export const getSiteMedia = cache(async (): Promise<MediaMap> => {
   if (!isSupabaseConfigured) return defaultsFor();
   try {
     return await loadMedia();
-  } catch {
+  } catch (error) {
+    logger.error("site_media.unavailable", { err: error, fallback: "defaults" });
     return defaultsFor();
   }
 });
@@ -122,7 +134,8 @@ export const getStoreInfo = cache(async (): Promise<StoreInfo> => {
   if (!isSupabaseConfigured) return STORE_DEFAULTS;
   try {
     return await loadStore();
-  } catch {
+  } catch (error) {
+    logger.error("site_settings.unavailable", { err: error, fallback: "defaults" });
     return STORE_DEFAULTS;
   }
 });

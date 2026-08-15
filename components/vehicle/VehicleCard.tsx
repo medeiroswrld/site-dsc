@@ -2,7 +2,7 @@ import Link from "next/link";
 import { VehiclePhoto } from "@/components/vehicle/VehiclePhoto";
 import { VehicleSpecPlate } from "@/components/vehicle/VehicleSpecPlate";
 import { formatPrice, vehicleShortTitle } from "@/lib/format";
-import { isRecentArrival } from "@/lib/vehicles-repository";
+import { isRecentArrival } from "@/lib/vehicle-filters";
 import { cn } from "@/lib/utils";
 import type { Vehicle } from "@/types/vehicle";
 
