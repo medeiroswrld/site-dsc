@@ -12,10 +12,10 @@ import {
 } from "motion/react";
 import { Play, WhatsApp } from "@/components/ui/icons";
 import { Container } from "@/components/ui/Container";
-import FoldText from "@/components/reactbits/FoldText";
 import { siteConfig } from "@/lib/site";
 import { whatsappGeneralLink } from "@/lib/whatsapp";
 import { useStore } from "@/components/layout/StoreProvider";
+import { FoldHeading } from "@/components/motion/FoldHeading";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -155,21 +155,7 @@ export function HeroVideo({
               Eight words land in under a second.
             */}
             <h1 className="font-display font-semibold leading-[0.99] tracking-[-0.035em] text-[clamp(2.125rem,1.15rem+3.6vw,3.875rem)]">
-              <FoldText
-                text="Carros selecionados, oficina própria e negociação sem enrolação."
-                splitBy="word"
-                hinge="top"
-                trigger="mount"
-                duration={0.6}
-                stagger={0.055}
-                ease="power3.out"
-                perspective={900}
-                creaseShading={0.5}
-                fontSize="inherit"
-                fontWeight="inherit"
-                color="var(--color-fg)"
-                className="fold-text--flush"
-              />
+              <FoldHeading text="Carros selecionados, oficina própria e negociação sem enrolação." />
             </h1>
 
             <motion.p

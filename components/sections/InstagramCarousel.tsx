@@ -1,9 +1,22 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import DepthCarousel from "@/components/reactbits/DepthCarousel";
+import dynamic from "next/dynamic";
 import type { InstagramPost } from "@/lib/instagram-repository";
 import { useStore } from "@/components/layout/StoreProvider";
+
+/**
+ * The carousel is the only thing in the project that needs GSAP, and it sits
+ * at the very bottom of the home page. Loading it with the page meant every
+ * visitor downloaded an animation engine to see a strip of photos most of them
+ * never scroll to. Now it arrives only once the section is close to the
+ * viewport — off the critical path entirely.
+ */
+// The cast restores the generic signature, which `dynamic()` erases — without
+// it `onItemActivate` would hand back the base item type instead of the post.
+const DepthCarousel = dynamic(() => import("@/components/reactbits/DepthCarousel"), {
+  ssr: false,
+}) as typeof import("@/components/reactbits/DepthCarousel").default;
 
 /**
  * Client wrapper around the React Bits carousel.
@@ -25,16 +38,34 @@ export function InstagramCarousel({ posts }: { posts: InstagramPost[] }) {
   const store = useStore();
   const frameRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
+  const [near, setNear] = useState(false);
 
   useEffect(() => {
     const frame = frameRef.current;
     if (!frame) return;
 
-    const observer = new ResizeObserver(([entry]) => {
+    const sizeObserver = new ResizeObserver(([entry]) => {
       setWidth(entry.contentRect.width);
     });
-    observer.observe(frame);
-    return () => observer.disconnect();
+    sizeObserver.observe(frame);
+
+    // 400px of margin: the chunk starts downloading while the section is still
+    // below the fold, so it is ready by the time it is actually on screen.
+    const nearObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setNear(true);
+          nearObserver.disconnect();
+        }
+      },
+      { rootMargin: "400px" },
+    );
+    nearObserver.observe(frame);
+
+    return () => {
+      sizeObserver.disconnect();
+      nearObserver.disconnect();
+    };
   }, []);
 
   // A phone gets a tighter fan and almost no side allowance: every pixel spent
@@ -59,7 +90,7 @@ export function InstagramCarousel({ posts }: { posts: InstagramPost[] }) {
       className="relative overflow-hidden"
       style={{ height: width > 0 ? `${height}px` : "26rem" }}
     >
-      {width > 0 && (
+      {width > 0 && near && (
         <DepthCarousel
           items={posts}
           cardWidth={card}
