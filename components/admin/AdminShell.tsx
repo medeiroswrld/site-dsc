@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminNav } from "@/components/admin/AdminNav";
 import { CarMark } from "@/components/layout/Wordmark";
 import { PendingLink } from "@/components/ui/PendingLink";
 import { signOut } from "@/lib/admin/session-actions";
@@ -26,55 +27,40 @@ export function AdminShell({
   return (
     <div className="min-h-svh">
       <header className="sticky top-0 z-30 border-b border-line bg-bg/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[80rem] items-center gap-4 px-5 sm:px-8">
-          <Link href="/admin" className="flex items-center gap-2.5">
-            <CarMark className="h-5 w-auto" />
-            <span className="plate text-[0.6875rem] uppercase tracking-[0.18em] text-fg-subtle">
-              Painel
-            </span>
-          </Link>
+        <div className="mx-auto max-w-[80rem] px-5 sm:px-8">
+          {/* Linha 1: identidade e as duas ações que valem em qualquer tela. */}
+          <div className="flex h-14 items-center gap-4 sm:h-16">
+            <Link href="/admin" className="flex shrink-0 items-center gap-2.5">
+              <CarMark className="h-5 w-auto" />
+              <span className="plate text-[0.6875rem] uppercase tracking-[0.18em] text-fg-subtle">
+                Painel
+              </span>
+            </Link>
 
-          <nav className="ml-auto flex items-center gap-1">
-            <Link
-              href="/admin"
-              className="px-3 py-2 text-[0.8125rem] text-fg-subtle transition-colors hover:text-fg"
-            >
-              Estoque
-            </Link>
-            <Link
-              href="/admin/conteudo"
-              className="px-3 py-2 text-[0.8125rem] text-fg-subtle transition-colors hover:text-fg"
-            >
-              Site
-            </Link>
-            <Link
-              href="/admin/instagram"
-              className="px-3 py-2 text-[0.8125rem] text-fg-subtle transition-colors hover:text-fg"
-            >
-              Instagram
-            </Link>
-            <Link
-              href="/admin/senha"
-              className="px-3 py-2 text-[0.8125rem] text-fg-subtle transition-colors hover:text-fg"
-            >
-              Senha
-            </Link>
-            <Link
-              href="/"
-              target="_blank"
-              className="px-3 py-2 text-[0.8125rem] text-fg-subtle transition-colors hover:text-fg"
-            >
-              Ver o site
-            </Link>
-            <form action={signOut}>
-              <button
-                type="submit"
-                className="px-3 py-2 text-[0.8125rem] text-fg-subtle transition-colors hover:text-fg"
+            {/* No desktop as abas voltam para a mesma linha; no celular elas
+                ficam na linha de baixo, que rola sozinha. */}
+            <AdminNav className="ml-auto hidden sm:flex" />
+
+            <div className="ml-auto flex shrink-0 items-center gap-1 sm:ml-4">
+              <Link
+                href="/"
+                target="_blank"
+                className="rounded-full px-3 py-2 text-[0.8125rem] text-fg-subtle transition-colors hover:bg-surface-2 hover:text-fg"
               >
-                Sair
-              </button>
-            </form>
-          </nav>
+                Ver o site
+              </Link>
+              <form action={signOut}>
+                <button
+                  type="submit"
+                  className="rounded-full px-3 py-2 text-[0.8125rem] text-fg-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+                >
+                  Sair
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <AdminNav className="pb-2 sm:hidden" />
         </div>
       </header>
 

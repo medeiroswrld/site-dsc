@@ -206,7 +206,9 @@ export function VehicleTable({
                   {STATUS_LABEL[vehicle.status]}
                 </span>
 
-                <div className="flex items-center gap-2">
+                {/* Sem quebra, os três controles somam ~304px e estouram um
+                    aparelho estreito. Aqui eles descem de linha em vez disso. */}
+                <div className="flex flex-wrap items-center gap-2">
                   <select
                     value={vehicle.status}
                     aria-label={`Situação de ${vehicle.model}`}
