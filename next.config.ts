@@ -14,6 +14,35 @@ const supabaseHost = (() => {
   }
 })();
 
+
+/**
+ * Security headers.
+ *
+ * The audit found only HSTS in place, which Vercel adds on its own. The gap
+ * that mattered was framing: with no X-Frame-Options, /admin could be loaded
+ * inside an attacker's page and a logged-in operator tricked into clicking
+ * through it. Everything below is a header the browser enforces for free.
+ *
+ * A full Content-Security-Policy is deliberately not here. Next injects inline
+ * scripts, the location section embeds a Google Maps iframe and photos come
+ * from Supabase — a strict policy needs per-request nonces and would break
+ * those in ways that only show up in production. `frame-ancestors` is the one
+ * CSP directive that is safe to set on its own, and it is the one that closes
+ * the clickjacking hole.
+ */
+const securityHeaders = [
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+  // Stops the browser second-guessing a declared type — the trick behind
+  // serving something as an image and having it execute as a script.
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+  },
+];
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   // A stray lockfile in the home directory makes Next guess the wrong project
@@ -40,6 +69,18 @@ const nextConfig: NextConfig = {
       : [],
   },
   poweredByHeader: false,
+
+  async headers() {
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      {
+        // The panel must never reach a search index, whatever a page forgets
+        // to declare in its own metadata.
+        source: "/admin/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
