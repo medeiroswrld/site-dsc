@@ -29,6 +29,14 @@ const PLAYER_SRC =
   // dnt keeps Vimeo from setting tracking cookies on the visitor.
   "&dnt=1&pip=0&keyboard=0&transparent=0";
 
+/**
+ * Proporção do arquivo no Vimeo, confirmada pela oEmbed em duas larguras.
+ * Se algum dia o vídeo for trocado por um de formato diferente, é o único
+ * número a mudar — a moldura se ajusta sozinha a partir dele.
+ */
+const VIDEO_AR = 16 / 9;
+const FRAME_AR = 16 / 9;
+
 export function AboutVideo({ className }: { className?: string }) {
   const frameRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -97,7 +105,13 @@ export function AboutVideo({ className }: { className?: string }) {
   return (
     <div
       ref={frameRef}
-      className={cn("relative overflow-hidden bg-surface-2", className)}
+      className={cn("video-cover bg-surface-2", className)}
+      style={
+        {
+          "--video-ar": VIDEO_AR,
+          "--frame-ar": FRAME_AR,
+        } as React.CSSProperties
+      }
     >
       {near && (
         <iframe
@@ -106,7 +120,6 @@ export function AboutVideo({ className }: { className?: string }) {
           title="Vídeo da D.S.C. Seminovos"
           allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
           referrerPolicy="strict-origin-when-cross-origin"
-          className="absolute inset-0 h-full w-full"
         />
       )}
 

@@ -25,7 +25,7 @@ export async function AboutSection() {
           <MediaReveal className="lg:col-span-7">
             {/* O vídeo ocupa o lugar que era da foto da fachada. A proporção
                 4:3 é a do próprio arquivo, a mesma que o embed do Vimeo pede. */}
-            <AboutVideo className="aspect-[4/3] rounded-2xl" />
+            <AboutVideo className="aspect-video rounded-2xl" />
           </MediaReveal>
 
           <div className="lg:col-span-5 lg:pt-6">

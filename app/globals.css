@@ -416,3 +416,28 @@
     animation: none;
   }
 }
+
+/* ==========================================================================
+   VÍDEO INCORPORADO
+
+   Um iframe de player não obedece object-fit: quem decide o enquadramento é o
+   documento de dentro, que encaixa o vídeo e preenche o resto com preto. A
+   saída é dimensionar o próprio iframe na proporção do arquivo e deixá-lo
+   transbordar a moldura, que corta. Assim nunca aparece faixa.
+   ========================================================================== */
+
+.video-cover {
+  position: relative;
+  overflow: hidden;
+}
+
+.video-cover iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 0;
+  /* Cresce pelo lado que faltar; o outro fica em 100% e nada é esticado. */
+  width: max(100%, calc(100% * var(--video-ar) / var(--frame-ar)));
+  height: max(100%, calc(100% * var(--frame-ar) / var(--video-ar)));
+}
