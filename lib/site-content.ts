@@ -68,24 +68,16 @@ export const MEDIA_SLOTS: MediaSlot[] = [
     alt: `Fachada da ${siteConfig.name}`,
   },
   {
+    // O id continua "workshop" de propósito: é a chave da linha no banco e do
+    // arquivo já enviado. Renomear aqui órfã a foto que a loja subiu.
     id: "workshop",
-    label: "Oficina",
-    where: 'Home, seção "Oficina própria"',
-    hint: "Visão geral da oficina, de preferência com carro no elevador.",
+    label: "Escritório",
+    where: 'Home, seção "Escritório próprio" — e na página Sobre',
+    hint: "O escritório onde a loja atende: mesa, atendimento, ambiente.",
     kind: "image",
     aspect: "4 / 3",
     fallback: "/placeholders/workshop.svg",
-    alt: `Oficina própria da ${siteConfig.shortName}`,
-  },
-  {
-    id: "workshop_detail",
-    label: "Oficina — detalhe",
-    where: 'Home, seção "Oficina própria", foto menor',
-    hint: "Um close: ferramenta na mão, peça, mecânico trabalhando.",
-    kind: "image",
-    aspect: "1 / 1",
-    fallback: "/placeholders/workshop-detail.svg",
-    alt: `Detalhe da oficina da ${siteConfig.shortName}`,
+    alt: `Escritório da ${siteConfig.shortName}`,
   },
   {
     id: "showroom",

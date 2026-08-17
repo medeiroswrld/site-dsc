@@ -19,8 +19,8 @@ export async function Footer() {
             <Wordmark />
             <p className="mt-5 max-w-xs text-[0.875rem] leading-relaxed text-fg-subtle">
               Loja de seminovos em {siteConfig.city}, {siteConfig.stateName}.
-              Veículos selecionados, oficina própria e atendimento direto da
-              equipe.
+              Veículos selecionados, escritório próprio e atendimento direto
+              da equipe.
             </p>
           </div>
 

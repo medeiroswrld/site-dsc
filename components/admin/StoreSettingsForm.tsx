@@ -66,7 +66,7 @@ export function StoreSettingsForm({ store }: { store: StoreInfo }) {
           name="foundedYearsText"
           label="Tempo de mercado"
           defaultValue={store.foundedYearsText}
-          hint='Entra na frase da home, ex: "mais de 7 anos"'
+          hint='Entra na frase da home, ex: "mais de 3 anos"'
         />
 
         <Field

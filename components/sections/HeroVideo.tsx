@@ -155,7 +155,7 @@ export function HeroVideo({
               Eight words land in under a second.
             */}
             <h1 className="font-display font-semibold leading-[0.99] tracking-[-0.035em] text-[clamp(2.125rem,1.15rem+3.6vw,3.875rem)]">
-              <FoldHeading text="Carros selecionados, oficina própria e negociação sem enrolação." />
+              <FoldHeading text="Carros selecionados, escritório próprio e negociação sem enrolação." />
             </h1>
 
             <motion.p

@@ -11,11 +11,11 @@ export const siteConfig = {
   /** Update to the production domain before launch. */
   url: "https://www.dscseminovos.com.br",
   description:
-    "Loja de carros seminovos em Itapetininga, São Paulo. Veículos selecionados, oficina própria e atendimento direto da equipe. Veja o estoque disponível.",
+    "Loja de carros seminovos em Itapetininga, São Paulo. Veículos selecionados, escritório próprio e atendimento direto da equipe. Veja o estoque disponível.",
   city: "Itapetininga",
   state: "SP",
   stateName: "São Paulo",
-  foundedYearsText: "mais de 7 anos",
+  foundedYearsText: "mais de 3 anos",
 
   address: {
     street: "R. Av. 5 de Novembro, 825",

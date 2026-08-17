@@ -127,9 +127,9 @@ export default async function VehiclePage({ params }: PageProps) {
                 Quer ver o carro pessoalmente?
               </h2>
               <p className="mt-2 max-w-xl text-[0.9375rem] leading-relaxed text-fg-muted">
-                O veículo está na loja em {siteConfig.city}. A oficina própria
-                fica no mesmo endereço, então dá para tirar dúvidas sobre a
-                parte mecânica na hora da visita.
+                O veículo está na loja em {siteConfig.city}, e o escritório
+                fica no mesmo endereço — dá para ver o carro, negociar e
+                resolver a documentação na mesma visita.
               </p>
               <UnderlineLink href="/contato" className="mt-3">
                 Ver endereço e horários

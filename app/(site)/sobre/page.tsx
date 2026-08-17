@@ -14,7 +14,7 @@ import { getSiteMedia, getStoreInfo } from "@/lib/site-content-repository";
 
 export const metadata: Metadata = {
   title: `A loja de seminovos em ${siteConfig.city}`,
-  description: `Há mais de 7 anos em ${siteConfig.city} - ${siteConfig.state}. Loja de seminovos selecionados com oficina própria e atendimento direto da equipe.`,
+  description: `Há mais de 3 anos em ${siteConfig.city} - ${siteConfig.state}. Loja de seminovos selecionados com escritório próprio e atendimento direto da equipe.`,
   alternates: { canonical: "/sobre" },
 };
 
@@ -25,8 +25,8 @@ export default async function AboutPage() {
     <>
       <PageHeader
         eyebrow="A D.S.C."
-        title={`Há mais de 7 anos em ${siteConfig.city}`}
-        description="Seminovos selecionados, atendimento direto e oficina própria — a operação inteira num endereço só."
+        title={`Há mais de 3 anos em ${siteConfig.city}`}
+        description="Seminovos selecionados, atendimento direto e escritório próprio — a operação inteira num endereço só."
       />
 
       <Container size="wide" className="pb-14 lg:pb-20">
@@ -57,10 +57,10 @@ export default async function AboutPage() {
                 parte das vendas passou a vir de indicação de quem já comprou.
               </p>
               <p>
-                Além do showroom, a empresa conta com oficina própria. A rotina
-                automotiva fica dentro de casa, o que permite acompanhar de
-                perto os veículos que entram no estoque e tirar dúvidas
-                mecânicas na própria visita.
+                Além do showroom, a empresa tem escritório próprio no mesmo
+                endereço. Negociação, documentação e atendimento ficam sob o
+                mesmo teto, o que encurta o caminho entre decidir pelo carro e
+                sair com ele.
               </p>
             </div>
           </Reveal>
@@ -68,9 +68,9 @@ export default async function AboutPage() {
           <Reveal delay={0.08} className="lg:col-span-5 xl:col-span-4 xl:col-start-9">
             <dl className="border-t border-line">
               {[
-                { label: "Atuação", value: "+7 anos" },
+                { label: "Atuação", value: "+3 anos" },
                 { label: "Cidade", value: `${siteConfig.city} - ${siteConfig.state}` },
-                { label: "Estrutura", value: "Loja e oficina própria" },
+                { label: "Estrutura", value: "Loja e escritório próprio" },
                 { label: "Telefone", value: store.phoneDisplay },
               ].map((item) => (
                 <div
@@ -114,7 +114,7 @@ export default async function AboutPage() {
         </div>
       </Container>
 
-      <WorkshopSection workshop={media.workshop} detail={media.workshop_detail} />
+      <WorkshopSection office={media.workshop} />
       <GoogleRating />
       <FinalCTA />
 

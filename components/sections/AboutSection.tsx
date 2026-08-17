@@ -5,18 +5,21 @@ import { MediaReveal, Reveal } from "@/components/motion/Reveal";
 import { Container } from "@/components/ui/Container";
 import { UnderlineLink } from "@/components/ui/UnderlineLink";
 import { siteConfig } from "@/lib/site";
+import { getStoreInfo } from "@/lib/site-content-repository";
 
 /**
  * Facts only. Everything stated here was supplied by the store: the years in
  * business, the workshop, the city. No mission statement, no superlatives.
  */
 const facts = [
-  { label: "Atuação", value: "+7 anos" },
-  { label: "Estrutura", value: "Oficina própria" },
+  { label: "Atuação", value: "+3 anos" },
+  { label: "Estrutura", value: "Escritório próprio" },
   { label: "Loja física", value: `${siteConfig.city} - ${siteConfig.state}` },
 ];
 
-export function AboutSection({ facade }: { facade: ResolvedMedia }) {
+export async function AboutSection({ facade }: { facade: ResolvedMedia }) {
+  const store = await getStoreInfo();
+
   return (
     <section className="bg-bg py-14 lg:py-20" aria-labelledby="sobre-titulo">
       <Container size="wide">
@@ -36,7 +39,7 @@ export function AboutSection({ facade }: { facade: ResolvedMedia }) {
             <Reveal>
               <p className="eyebrow">A D.S.C.</p>
               <h2 id="sobre-titulo" className="display-2 mt-4">
-                Há mais de 7 anos em {siteConfig.city}
+                Há {store.foundedYearsText} em {siteConfig.city}
               </h2>
             </Reveal>
 
@@ -49,8 +52,8 @@ export function AboutSection({ facade }: { facade: ResolvedMedia }) {
                   o fim.
                 </p>
                 <p>
-                  Além da loja, a empresa conta com oficina própria — a rotina
-                  automotiva fica dentro de casa, e não terceirizada.
+                  Além da loja, a empresa tem escritório próprio — negociação,
+                  documentação e atendimento acontecem no mesmo endereço.
                 </p>
               </div>
             </Reveal>

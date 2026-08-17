@@ -5,70 +5,54 @@ import { MediaReveal, Reveal } from "@/components/motion/Reveal";
 import { Container } from "@/components/ui/Container";
 
 /**
- * The workshop is the store's one structural differentiator, so it gets its
- * own dark chapter rather than a bullet in a feature list. Deliberately makes
- * no claim about inspections, checklists or warranties — none were confirmed.
+ * The store's own premises: one chapter, one photograph.
+ *
+ * It used to be two images in a staggered pair, which only works when there is
+ * a detail shot worth the second frame. With a single photo the pair collapses
+ * into a lopsided layout, so the frame here is one wide image that holds the
+ * column on its own.
+ *
+ * Deliberately makes no claim about inspections, checklists or warranties —
+ * none were confirmed.
  */
-export function WorkshopSection({
-  workshop,
-  detail,
-}: {
-  workshop: ResolvedMedia;
-  detail: ResolvedMedia;
-}) {
+export function WorkshopSection({ office }: { office: ResolvedMedia }) {
   return (
     <section
       className="bg-surface py-14 lg:py-20"
-      aria-labelledby="oficina-titulo"
+      aria-labelledby="escritorio-titulo"
     >
       <Container size="wide">
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
           <div className="lg:col-span-5 lg:pt-10">
             <Reveal>
               <p className="plate text-[0.6875rem] uppercase tracking-[0.18em] text-fg-subtle">
-                Oficina própria
+                Escritório próprio
               </p>
-              <h2 id="oficina-titulo" className="display-2 mt-4 text-fg">
-                Carro também se conhece nos bastidores.
+              <h2 id="escritorio-titulo" className="display-2 mt-4 text-fg">
+                Um endereço fixo, com quem decide por perto.
               </h2>
             </Reveal>
 
             <Reveal delay={0.06}>
               <p className="mt-6 max-w-md text-[1.0625rem] leading-relaxed text-fg-muted">
-                A D.S.C. conta com oficina própria, trazendo a rotina
-                automotiva para perto da operação da loja. É a mesma estrutura
-                que atende o dia a dia da empresa e fica disponível para tirar
-                dúvidas sobre o veículo antes da negociação.
+                A D.S.C. tem escritório próprio, onde a negociação, a
+                documentação e o atendimento acontecem no mesmo lugar. Dá para
+                sentar, tirar dúvidas sobre o veículo e resolver a papelada sem
+                depender de terceiros.
               </p>
             </Reveal>
           </div>
 
-          <div className="grid grid-cols-5 gap-4 lg:col-span-7 lg:gap-5">
-            <MediaReveal className="relative col-span-3 aspect-[4/3.4] rounded-2xl bg-surface-2">
-              <Image
-                src={workshop.src}
-                alt={workshop.alt}
-                unoptimized={workshop.isPlaceholder || isVectorSource(workshop.src)}
-                fill
-                sizes="(min-width: 1024px) 35vw, 55vw"
-                className="object-cover"
-              />
-            </MediaReveal>
-
-            <MediaReveal
-              delay={0.1}
-              className="relative col-span-2 mt-10 aspect-[3/4.2] rounded-2xl bg-surface-2 lg:mt-16"
-            >
-              <Image
-                src={detail.src}
-                alt={detail.alt}
-                unoptimized={detail.isPlaceholder || isVectorSource(detail.src)}
-                fill
-                sizes="(min-width: 1024px) 23vw, 37vw"
-                className="object-cover"
-              />
-            </MediaReveal>
-          </div>
+          <MediaReveal className="relative aspect-[4/3] rounded-2xl bg-surface-2 lg:col-span-7 lg:aspect-[4/2.9]">
+            <Image
+              src={office.src}
+              alt={office.alt}
+              unoptimized={office.isPlaceholder || isVectorSource(office.src)}
+              fill
+              sizes="(min-width: 1024px) 58vw, 92vw"
+              className="object-cover"
+            />
+          </MediaReveal>
         </div>
       </Container>
     </section>
