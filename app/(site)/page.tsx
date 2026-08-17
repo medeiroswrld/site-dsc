@@ -34,7 +34,7 @@ export default async function HomePage() {
     <>
       <HeroVideo poster={media.hero_poster} video={heroFilm} />
       <FeaturedVehicles vehicles={featured} />
-      <AboutSection facade={media.facade} />
+      <AboutSection />
       <WorkshopSection office={media.workshop} />
       <Showroom360 />
       <GoogleRating />

@@ -1,11 +1,9 @@
-import Image from "next/image";
-import type { ResolvedMedia } from "@/lib/site-content";
-import { isVectorSource } from "@/lib/image";
 import { MediaReveal, Reveal } from "@/components/motion/Reveal";
 import { Container } from "@/components/ui/Container";
 import { UnderlineLink } from "@/components/ui/UnderlineLink";
 import { siteConfig } from "@/lib/site";
 import { getStoreInfo } from "@/lib/site-content-repository";
+import { AboutVideo } from "@/components/sections/AboutVideo";
 
 /**
  * Facts only. Everything stated here was supplied by the store: the years in
@@ -17,22 +15,17 @@ const facts = [
   { label: "Loja física", value: `${siteConfig.city} - ${siteConfig.state}` },
 ];
 
-export async function AboutSection({ facade }: { facade: ResolvedMedia }) {
+export async function AboutSection() {
   const store = await getStoreInfo();
 
   return (
     <section className="bg-bg py-14 lg:py-20" aria-labelledby="sobre-titulo">
       <Container size="wide">
         <div className="grid items-start gap-10 lg:grid-cols-12 lg:gap-14">
-          <MediaReveal className="relative aspect-[4/3] rounded-2xl bg-surface-2 lg:col-span-7 lg:aspect-[4/3.1]">
-            <Image
-              src={facade.src}
-              alt={facade.alt}
-              unoptimized={facade.isPlaceholder || isVectorSource(facade.src)}
-              fill
-              sizes="(min-width: 1024px) 58vw, 92vw"
-              className="object-cover"
-            />
+          <MediaReveal className="lg:col-span-7">
+            {/* O vídeo ocupa o lugar que era da foto da fachada. A proporção
+                4:3 é a do próprio arquivo, a mesma que o embed do Vimeo pede. */}
+            <AboutVideo className="aspect-[4/3] rounded-2xl" />
           </MediaReveal>
 
           <div className="lg:col-span-5 lg:pt-6">
