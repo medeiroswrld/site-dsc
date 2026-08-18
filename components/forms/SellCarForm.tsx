@@ -123,7 +123,7 @@ export function SellCarForm() {
         { label: "Cor", value: values.color },
         { label: "Observações", value: values.notes },
       ],
-    }, store.whatsappSellCar);
+    }, store.whatsapp);
 
     setSentUrl(url);
     window.open(url, "_blank", "noopener,noreferrer");

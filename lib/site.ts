@@ -38,16 +38,8 @@ export const siteConfig = {
     e164: "+551532710164",
   },
 
-  /**
-   * WhatsApp da loja, só dígitos com o código do país.
-   *
-   * São dois de propósito. O geral atende estoque, financiamento e contato —
-   * é onde o comprador chega. O de avaliação recebe quem quer vender ou dar
-   * o carro na troca, que é uma conversa diferente e costuma ficar com outra
-   * pessoa da equipe.
-   */
-  whatsapp: "5515992268988",
-  whatsappSellCar: "551532710164",
+  /** WhatsApp da loja, só dígitos com o código do país. */
+  whatsapp: "551532710164",
 
   instagram: {
     handle: "@dsc_seminovos",

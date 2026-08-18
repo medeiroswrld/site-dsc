@@ -145,8 +145,6 @@ export interface StoreInfo {
   phoneDisplay: string;
   phoneE164: string;
   whatsapp: string;
-  /** Recebe quem quer vender ou usar o carro na troca. */
-  whatsappSellCar: string;
   street: string;
   neighbourhood: string;
   city: string;
@@ -166,7 +164,6 @@ export const STORE_DEFAULTS: StoreInfo = {
   phoneDisplay: siteConfig.phone.display,
   phoneE164: siteConfig.phone.e164,
   whatsapp: siteConfig.whatsapp,
-  whatsappSellCar: siteConfig.whatsappSellCar,
   street: siteConfig.address.street,
   neighbourhood: siteConfig.address.neighbourhood,
   city: siteConfig.address.city,

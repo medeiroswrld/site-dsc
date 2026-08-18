@@ -59,7 +59,7 @@ export function whatsappFinanceLink(vehicle?: Vehicle, number?: string): string 
 }
 
 /** Trade-in / sale enquiry. */
-export function whatsappSellCarLink(number: string = siteConfig.whatsappSellCar): string {
+export function whatsappSellCarLink(number?: string): string {
   return buildLink(
     `Olá! Quero vender ou usar meu carro na troca e gostaria de uma avaliação da ${siteConfig.name}.`,
     number,
