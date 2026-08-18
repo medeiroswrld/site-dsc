@@ -9,7 +9,7 @@ import { siteConfig } from "@/lib/site";
 import { getAllVehicles } from "@/lib/vehicles-repository";
 
 export const metadata: Metadata = {
-  title: "Financiamento de seminovos",
+  title: `Financiamento de Seminovos em ${siteConfig.city}`,
   description: `Solicite uma simulação de financiamento na ${siteConfig.name}, em ${siteConfig.city} - ${siteConfig.state}. Informe o veículo de interesse e a equipe entra em contato.`,
   alternates: { canonical: "/financiamento" },
 };

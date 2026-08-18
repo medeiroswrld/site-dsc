@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const store = await getStoreInfo();
   const channels = buildChannels(store);
   return {
-    title: "Contato e localização",
+    title: `Contato e Localização em ${siteConfig.city} - ${siteConfig.state}`,
     description: `Fale com a ${siteConfig.name} em ${siteConfig.city} - ${siteConfig.state}. Endereço, telefone ${store.phoneDisplay}, WhatsApp e horários de atendimento.`,
     alternates: { canonical: "/contato" },
   };

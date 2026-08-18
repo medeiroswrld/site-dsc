@@ -37,7 +37,10 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} | Carros Seminovos em ${siteConfig.city}`,
+    // A palavra-chave vem antes da marca de propósito: a loja tem três anos
+    // e ninguém procura por "D.S.C." — procuram por seminovos na cidade, e é
+    // esse o trecho que precisa sobreviver ao corte do Google.
+    default: `Seminovos em ${siteConfig.city} | ${siteConfig.name}`,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -48,12 +51,12 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     url: siteConfig.url,
     siteName: siteConfig.name,
-    title: `${siteConfig.name} | Carros Seminovos em ${siteConfig.city}`,
+    title: `Seminovos em ${siteConfig.city} | ${siteConfig.name}`,
     description: siteConfig.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.name} | Carros Seminovos em ${siteConfig.city}`,
+    title: `Seminovos em ${siteConfig.city} | ${siteConfig.name}`,
     description: siteConfig.description,
   },
   robots: {
@@ -66,8 +69,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#101315",
-  colorScheme: "light",
+  themeColor: "#08080a",
+  colorScheme: "dark",
 };
 
 export default async function RootLayout({

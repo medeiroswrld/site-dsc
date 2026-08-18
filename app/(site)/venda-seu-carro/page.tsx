@@ -11,7 +11,7 @@ import { isVectorSource } from "@/lib/image";
 import { getSiteMedia } from "@/lib/site-content-repository";
 
 export const metadata: Metadata = {
-  title: "Venda ou troque seu carro",
+  title: `Vendemos ou Avaliamos seu Carro em ${siteConfig.city}`,
   description: `Envie os dados do seu veículo para avaliação da ${siteConfig.name}, em ${siteConfig.city} - ${siteConfig.state}. A equipe analisa as informações e entra em contato.`,
   alternates: { canonical: "/venda-seu-carro" },
 };

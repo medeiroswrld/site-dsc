@@ -68,6 +68,10 @@ const nextConfig: NextConfig = {
         ]
       : [],
   },
+  // sharp é usado direto na rota da imagem de compartilhamento; mantê-lo
+  // fora do bundle evita que o empacotador tente resolver o binário nativo.
+  serverExternalPackages: ["sharp"],
+
   poweredByHeader: false,
 
   async headers() {

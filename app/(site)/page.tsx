@@ -15,7 +15,7 @@ import { getSiteMedia } from "@/lib/site-content-repository";
 import { getFeaturedVehicles } from "@/lib/vehicles-repository";
 
 export const metadata: Metadata = {
-  title: `${siteConfig.name} | Carros Seminovos em ${siteConfig.city}`,
+  title: `Seminovos em ${siteConfig.city} | ${siteConfig.name}`,
   description: siteConfig.description,
   alternates: { canonical: "/" },
 };

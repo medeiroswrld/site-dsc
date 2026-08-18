@@ -9,7 +9,7 @@ import { filtersFromParams } from "@/lib/stock-params";
 import { getAllVehicles, getStockFacets } from "@/lib/vehicles-repository";
 
 export const metadata: Metadata = {
-  title: `Estoque de seminovos em ${siteConfig.city}`,
+  title: `Carros Seminovos em ${siteConfig.city} | Estoque`,
   description: `Veja os carros seminovos disponíveis na ${siteConfig.name}, em ${siteConfig.city} - ${siteConfig.state}. Filtre por marca, modelo, ano, preço e quilometragem.`,
   alternates: { canonical: "/estoque" },
   openGraph: {
