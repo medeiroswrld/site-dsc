@@ -21,7 +21,7 @@ const EQUIPE = [
   { nome: "Larissa", foto: "/equipe/larissa.webp" },
   { nome: "Mauricio", foto: "/equipe/mauricio.webp" },
   { nome: "Oseias", foto: "/equipe/oseias.webp" },
-  { nome: "Queixo", foto: "/equipe/queixo.webp" },
+  { nome: "Ricardo", foto: "/equipe/ricardo.webp" },
   { nome: "Rodrigo", foto: "/equipe/rodrigo.webp" },
   { nome: "Victor", foto: "/equipe/victor.webp" },
 ];

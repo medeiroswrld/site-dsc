@@ -89,29 +89,6 @@ export default async function AboutPage() {
           </Reveal>
         </div>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:mt-20">
-          <MediaReveal className="relative aspect-[4/3] rounded-2xl bg-surface-2">
-            <Image
-              src={media.showroom.src}
-              alt={media.showroom.alt}
-              fill
-              unoptimized={media.showroom.isPlaceholder || isVectorSource(media.showroom.src)}
-              sizes="(min-width: 640px) 46vw, 92vw"
-              className="object-cover"
-            />
-          </MediaReveal>
-
-          <MediaReveal delay={0.08} className="relative aspect-[4/3] rounded-2xl bg-surface-2">
-            <Image
-              src={media.team.src}
-              alt={media.team.alt}
-              fill
-              unoptimized={media.team.isPlaceholder || isVectorSource(media.team.src)}
-              sizes="(min-width: 640px) 46vw, 92vw"
-              className="object-cover"
-            />
-          </MediaReveal>
-        </div>
       </Container>
 
       <WorkshopSection office={media.workshop} />
