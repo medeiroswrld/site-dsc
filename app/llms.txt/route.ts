@@ -2,7 +2,7 @@ import { formatMileage, formatPrice, formatYear, vehicleTitle } from "@/lib/form
 import { siteConfig } from "@/lib/site";
 import { formatAddress } from "@/lib/site-content";
 import { getStoreInfo } from "@/lib/site-content-repository";
-import { getAllVehicles } from "@/lib/vehicles-repository";
+import { getStockVehicles } from "@/lib/vehicles-repository";
 
 /**
  * /llms.txt — a plain-language summary of the shop for language models.
@@ -21,9 +21,8 @@ import { getAllVehicles } from "@/lib/vehicles-repository";
 export const revalidate = 3600;
 
 export async function GET() {
-  const [store, vehicles] = await Promise.all([getStoreInfo(), getAllVehicles()]);
+  const [store, available] = await Promise.all([getStoreInfo(), getStockVehicles()]);
 
-  const available = vehicles.filter((vehicle) => vehicle.status === "available");
   const hours = store.hours.map((entry) => `${entry.days}: ${entry.time}`).join(" | ");
 
   const stock = available.length

@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/site";
-import { getAllVehicles } from "@/lib/vehicles-repository";
+import { getStockVehicles } from "@/lib/vehicles-repository";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const vehicles = await getAllVehicles();
+  const vehicles = await getStockVehicles();
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -21,9 +21,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Sold vehicles are excluded to match their `noindex` metadata.
+  // getStockVehicles já exclui os vendidos, que agora redirecionam.
   const vehicleRoutes: MetadataRoute.Sitemap = vehicles
-    .filter((vehicle) => vehicle.status !== "sold")
     .map((vehicle) => ({
       url: `${siteConfig.url}/estoque/${vehicle.slug}`,
       lastModified: new Date(vehicle.createdAt),

@@ -16,8 +16,8 @@ import { formatYear, vehicleShortTitle, vehicleTitle } from "@/lib/format";
 import { breadcrumbSchema, vehicleSchema } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 import {
-  getAllVehicles,
   getRelatedVehicles,
+  getStockVehicles,
   getVehicleBySlug,
 } from "@/lib/vehicles-repository";
 
@@ -25,8 +25,23 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+/**
+ * Só existe página para o que está à venda.
+ *
+ * `dynamicParams: false` é o que faz um veículo vendido deixar de existir de
+ * verdade — a rota é recusada no roteamento e o servidor responde 404.
+ *
+ * As duas alternativas foram testadas e descartadas. `redirect()` numa rota
+ * estática vira `<meta http-equiv="refresh" content="1;url=/estoque">`: um
+ * segundo olhando a página do carro vendido, título dizendo "à venda", e
+ * resposta 200. `notFound()` renderiza a tela certa mas também responde 200,
+ * porque a rota é gerada sob demanda e fica em cache — um soft 404, que o
+ * Google trata como página real.
+ */
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
-  const vehicles = await getAllVehicles();
+  const vehicles = await getStockVehicles();
   return vehicles.map((vehicle) => ({ slug: vehicle.slug }));
 }
 
@@ -47,12 +62,7 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: `/estoque/${vehicle.slug}` },
-    // A sold vehicle stays reachable for anyone holding the link, but it is
-    // not worth a search result.
-    robots:
-      vehicle.status === "sold"
-        ? { index: false, follow: true }
-        : { index: true, follow: true },
+    robots: { index: true, follow: true },
     openGraph: {
       type: "website",
       title: `${title} | ${siteConfig.name}`,

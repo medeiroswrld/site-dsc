@@ -6,7 +6,7 @@ import { Container } from "@/components/ui/Container";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { breadcrumbSchema } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
-import { getAllVehicles } from "@/lib/vehicles-repository";
+import { getStockVehicles } from "@/lib/vehicles-repository";
 
 export const metadata: Metadata = {
   title: `Financiamento de Seminovos em ${siteConfig.city}`,
@@ -26,7 +26,7 @@ export default async function FinancePage({
 }) {
   const [{ veiculo }, vehicles] = await Promise.all([
     searchParams,
-    getAllVehicles(),
+    getStockVehicles(),
   ]);
 
   return (

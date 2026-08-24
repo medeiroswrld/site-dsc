@@ -132,6 +132,22 @@ export const getAllVehicles = cache(async function getAllVehicles(): Promise<
 });
 
 /**
+ * O catálogo público: o que a loja tem para vender, hoje.
+ *
+ * Um carro vendido deixa de existir para o visitante — não aparece na lista,
+ * não entra nas opções de filtro e não conta no total. A loja pediu assim, e
+ * faz sentido: vitrine com carro vendido faz o estoque parecer maior do que é
+ * e gasta o tempo de quem clica.
+ *
+ * `getAllVehicles` continua devolvendo tudo, porque o painel e o sitemap
+ * precisam enxergar os vendidos para tratá-los.
+ */
+export async function getStockVehicles(): Promise<Vehicle[]> {
+  const all = await getAllVehicles();
+  return all.filter((vehicle) => vehicle.status !== "sold");
+}
+
+/**
  * Derived from the cached list rather than its own query. A used-car lot holds
  * tens of vehicles, not thousands, so filtering in memory is faster than a
  * second round trip and keeps one cache entry instead of one per slug.
@@ -144,8 +160,7 @@ export async function getVehicleBySlug(
 }
 
 export async function getFeaturedVehicles(limit = 6): Promise<Vehicle[]> {
-  const all = await getAllVehicles();
-  const sellable = all.filter((vehicle) => vehicle.status !== "sold");
+  const sellable = await getStockVehicles();
 
   return [
     ...sellable.filter((vehicle) => vehicle.featured),
@@ -197,7 +212,7 @@ const EMPTY_FACETS: StockFacets = {
 
 /** Built from the stock itself, so the filters never offer an empty result. */
 export async function getStockFacets(): Promise<StockFacets> {
-  const list = await getAllVehicles();
+  const list = await getStockVehicles();
   if (!list.length) return EMPTY_FACETS;
 
   const priced = list

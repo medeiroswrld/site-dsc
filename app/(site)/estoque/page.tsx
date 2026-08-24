@@ -6,7 +6,7 @@ import { JsonLd } from "@/components/ui/JsonLd";
 import { breadcrumbSchema, itemListSchema } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 import { filtersFromParams } from "@/lib/stock-params";
-import { getAllVehicles, getStockFacets } from "@/lib/vehicles-repository";
+import { getStockFacets, getStockVehicles } from "@/lib/vehicles-repository";
 
 export const metadata: Metadata = {
   title: `Carros Seminovos em ${siteConfig.city} | Estoque`,
@@ -26,7 +26,7 @@ export default async function StockPage({
 }) {
   const [params, vehicles, facets] = await Promise.all([
     searchParams,
-    getAllVehicles(),
+    getStockVehicles(),
     getStockFacets(),
   ]);
 
