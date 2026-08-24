@@ -7,6 +7,7 @@ import { HeroVideo } from "@/components/sections/HeroVideo";
 import { InstagramSection } from "@/components/sections/InstagramSection";
 import { LocationSection } from "@/components/sections/LocationSection";
 import { Showroom360 } from "@/components/sections/Showroom360";
+import { TeamStrip } from "@/components/sections/TeamStrip";
 import { WorkshopSection } from "@/components/sections/WorkshopSection";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { itemListSchema } from "@/lib/seo";
@@ -35,6 +36,7 @@ export default async function HomePage() {
       <HeroVideo poster={media.hero_poster} video={heroFilm} />
       <FeaturedVehicles vehicles={featured} />
       <AboutSection />
+      <TeamStrip />
       <WorkshopSection office={media.workshop} />
       <Showroom360 />
       <GoogleRating />

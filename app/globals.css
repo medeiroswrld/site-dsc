@@ -441,3 +441,75 @@
   width: max(100%, calc(100% * var(--video-ar) / var(--frame-ar)));
   height: max(100%, calc(100% * var(--frame-ar) / var(--video-ar)));
 }
+
+/* ==========================================================================
+   FAIXA DA EQUIPE
+
+   Dez pessoas numa linha só. O laço é feito duplicando a lista no markup e
+   deslocando a trilha em exatamente metade da própria largura: ao chegar em
+   -50% a segunda cópia está onde a primeira começou, e o reinício é invisível.
+   Por isso a animação usa porcentagem da trilha, e não uma distância em pixels
+   que precisaria ser recalculada a cada tamanho de tela.
+   ========================================================================== */
+
+.team-strip {
+  overflow: hidden;
+  /* mask no lugar de um degradê sobreposto: some nas bordas sem pintar por
+     cima, então funciona igual em qualquer fundo. */
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 6rem,
+    #000 calc(100% - 6rem),
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 6rem,
+    #000 calc(100% - 6rem),
+    transparent
+  );
+}
+
+.team-strip__track {
+  display: flex;
+  width: max-content;
+  gap: 1.75rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  animation: team-scroll 48s linear infinite;
+}
+
+/* Parar no hover deixa ler o nome de quem passou. Só onde há ponteiro de
+   verdade — no toque isso travaria a faixa ao rolar a página. */
+@media (hover: hover) {
+  .team-strip:hover .team-strip__track {
+    animation-play-state: paused;
+  }
+}
+
+.team-strip__item {
+  flex: 0 0 auto;
+}
+
+@keyframes team-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Sem movimento automático, a faixa vira uma lista que se arrasta com o dedo
+   ou com a barra — o conteúdo continua todo alcançável. */
+@media (prefers-reduced-motion: reduce) {
+  .team-strip {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .team-strip__track {
+    animation: none;
+  }
+}
