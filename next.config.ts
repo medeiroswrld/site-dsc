@@ -50,6 +50,22 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: import.meta.dirname,
   images: {
     formats: ["image/avif", "image/webp"],
+
+    /**
+     * 30 dias no cache do otimizador.
+     *
+     * O Supabase serve as fotos com `max-age=3600`, e o next/image respeitava
+     * isso: de hora em hora o cache expirava e o primeiro visitante pagava a
+     * reotimização inteira — buscar o original, transcodificar, devolver. No
+     * PageSpeed isso apareceu como `X-Vercel-Cache: MISS` e um intervalo de
+     * quatro segundos entre a primeira pintura e o maior elemento.
+     *
+     * É seguro guardar por muito tempo porque o nome do arquivo carrega o
+     * instante do upload: trocar a foto pelo painel gera outro caminho, e a
+     * URL antiga simplesmente deixa de ser pedida. Cache longo aqui nunca
+     * serve conteúdo velho.
+     */
+    minimumCacheTTL: 2592000,
     /**
      * next/image re-encodes every photo it serves, and its default quality of
      * 75 lands on top of the compression the browser already applied at

@@ -77,7 +77,22 @@ export function VehicleRail({ vehicles }: { vehicles: Vehicle[] }) {
           >
             <VehicleCard
               vehicle={vehicle}
-              priority={index < 2}
+              /*
+               * Sem priority.
+               *
+               * O trilho de destaques vem depois do hero, que ocupa a tela
+               * inteira — nenhum card está acima da dobra em aparelho nenhum.
+               * Marcá-los gerava <link rel="preload"> para duas fotos em
+               * qualidade 90, as maiores do site, competindo por banda com a
+               * imagem do topo, que é o elemento de LCP.
+               *
+               * Numa conexão lenta essa disputa custa segundos no que o
+               * visitante realmente espera ver. Carregamento preguiçoso é o
+               * comportamento certo aqui: quando ele rolar, a foto chega.
+               *
+               * O /estoque é outro caso — lá os primeiros cards são a primeira
+               * coisa na tela, e o priority deles continua.
+               */
               sizes="(min-width: 1280px) 25rem, (min-width: 1024px) 31vw, (min-width: 640px) 46vw, 78vw"
             />
           </li>
