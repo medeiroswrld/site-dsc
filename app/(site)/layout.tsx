@@ -3,6 +3,7 @@ import { Archivo, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { Analytics } from "@/components/analytics/Analytics";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { autoDealerSchema, websiteSchema } from "@/lib/seo";
 import { StoreProvider } from "@/components/layout/StoreProvider";
@@ -114,6 +115,8 @@ export default async function RootLayout({
           <Footer />
           <WhatsAppButton />
         </StoreProvider>
+
+        <Analytics />
 
         <JsonLd data={autoDealerSchema(store)} />
         <JsonLd data={websiteSchema()} />
