@@ -6,7 +6,8 @@ import { cookies } from "next/headers";
 import { supabaseAnonKey, supabaseUrl } from "@/lib/supabase/config";
 
 /** Server-only. Bypasses RLS, so it must never reach the browser bundle. */
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+// Mesmo motivo do trim em supabase/config.ts: valor colado em painel.
+const supabaseServiceKey = (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").trim();
 
 export const canWriteToSupabase = Boolean(supabaseUrl && supabaseServiceKey);
 

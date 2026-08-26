@@ -7,8 +7,15 @@
  * checks, so a fresh clone with no .env.local still renders.
  */
 
-export const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-export const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+/*
+ * `.trim()` não é zelo excessivo: colar um valor no painel da Vercel arrasta
+ * espaço ou quebra de linha com facilidade, e foi o que aconteceu aqui — a URL
+ * do projeto chegou com uma quebra de linha no fim, e toda imagem passou a ser
+ * pedida de um endereço com esse caractere no meio. O otimizador tolerou e
+ * nada quebrou de forma visível, que é justamente o pior tipo de defeito.
+ */
+export const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").trim();
+export const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "").trim();
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
