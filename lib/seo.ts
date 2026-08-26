@@ -64,6 +64,9 @@ export function autoDealerSchema(store: StoreInfo = STORE_DEFAULTS) {
     // A rota da imagem de compartilhamento não serve aqui: o Next publica
     // com hash no caminho, e um /opengraph-image sem ele dá 404. O logo é
     // estável e é o que o Google mostra ao lado do nome da loja.
+    // O CNPJ é o identificador que amarra o site a uma empresa registrada —
+    // sinal de legitimidade que o Google usa, e barato de fornecer.
+    taxID: siteConfig.cnpj,
     image: `${siteConfig.url}/brand/dsc-seminovos.png`,
     logo: `${siteConfig.url}/brand/dsc-seminovos.png`,
     knowsAbout: [

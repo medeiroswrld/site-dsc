@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Wordmark } from "@/components/layout/Wordmark";
 import { Container } from "@/components/ui/Container";
 import { Instagram } from "@/components/ui/icons";
-import { navigation, siteConfig } from "@/lib/site";
+import { formatCnpj, navigation, siteConfig } from "@/lib/site";
 import { getStoreInfo } from "@/lib/site-content-repository";
 import { formatAddress, mapsDirections, mapsEmbed } from "@/lib/site-content";
 
@@ -100,6 +100,12 @@ export async function Footer() {
         <div className="flex flex-col gap-4 border-t border-line py-7 sm:flex-row sm:items-center sm:justify-between">
           <p className="plate text-[0.6875rem] text-fg-subtle">
             © {year} {siteConfig.name}
+            {/* O CNPJ fica junto do © porque é a mesma informação: quem
+                responde legalmente pelo site. Em fonte tabular para os
+                dígitos não dançarem de largura entre si. */}
+            <span className="ml-2 tnum text-fg-subtle/70">
+              · CNPJ {formatCnpj(siteConfig.cnpj)}
+            </span>
           </p>
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             <li>

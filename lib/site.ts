@@ -8,6 +8,8 @@ export const siteConfig = {
   name: "D.S.C. Seminovos",
   shortName: "D.S.C.",
   legalName: "D.S.C. Seminovos",
+  /** Só dígitos aqui; a formatação fica em `formatCnpj`, para não haver duas verdades. */
+  cnpj: "51747334000164",
   /** Update to the production domain before launch. */
   url: "https://www.dscseminovos.com.br",
   description:
@@ -65,6 +67,11 @@ export const siteConfig = {
     { days: "Sábado", time: "08h30 às 12h30" },
   ],
 } as const;
+
+/** 51747334000164 -> 51.747.334/0001-64 */
+export function formatCnpj(digits: string): string {
+  return digits.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+}
 
 export const fullAddress = `${siteConfig.address.street}, ${siteConfig.address.neighbourhood}, ${siteConfig.address.city} - ${siteConfig.address.state}, ${siteConfig.address.postalCode}`;
 
