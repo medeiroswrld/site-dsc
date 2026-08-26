@@ -16,9 +16,18 @@ import {
  * convivem. Carregar o script duas vezes duplica evento e é o erro mais comum
  * quando as duas contas entram em momentos diferentes.
  *
- * `afterInteractive` deixa o gtag fora do HTML do servidor: ele é injetado só
- * depois da hidratação. Isso é esperado, não é falha — procurar por "gtag" no
- * código-fonte da página não vai encontrar nada.
+ * `lazyOnload` e não `afterInteractive`: o gtag.js são 165 kB servidos pelo
+ * Google, e com `afterInteractive` eles disputavam banda com a imagem do topo
+ * numa conexão de celular. Medir não é o que o visitante veio fazer — o script
+ * espera a página terminar de carregar.
+ *
+ * O custo é perder quem sai em menos de dois segundos. Numa loja de seminovos
+ * essa visita não vira contato de qualquer forma, e a troca compensa: o site
+ * aparece antes para quem fica.
+ *
+ * De qualquer estratégia, o gtag fica fora do HTML do servidor — é injetado
+ * depois. Procurar por "gtag" no código-fonte não encontra nada, e isso é
+ * esperado.
  */
 export function Analytics() {
   useConversionTracking();
@@ -29,10 +38,10 @@ export function Analytics() {
     <>
       <Script
         id="gtag-loader"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
       />
-      <Script id="gtag-config" strategy="afterInteractive">
+      <Script id="gtag-config" strategy="lazyOnload">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
