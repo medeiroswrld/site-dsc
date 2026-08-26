@@ -28,10 +28,10 @@ export const siteConfig = {
     country: "BR",
   },
 
-  /** Approximate store coordinates — refine with the exact pin from Maps. */
+  /** Pin exato da loja, tirado do Google Maps. */
   geo: {
-    latitude: -23.5915,
-    longitude: -48.0533,
+    latitude: -23.594773736633208,
+    longitude: -48.06013497730157,
   },
 
   phone: {
