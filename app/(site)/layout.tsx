@@ -59,6 +59,21 @@ export const metadata: Metadata = {
     title: `Seminovos em ${siteConfig.city} | ${siteConfig.name}`,
     description: siteConfig.description,
   },
+  /*
+   * Verificação do Search Console pelo método de tag HTML.
+   *
+   * O token que o Google entregou veio no formato `google-site-verification=…`,
+   * que é o do registro TXT de DNS. Este campo cobre o outro método: se a
+   * propriedade for criada por prefixo de URL, a tag já está aqui; se for por
+   * domínio, quem verifica é o DNS e esta linha é inofensiva.
+   *
+   * A propriedade de domínio é a preferível — cobre www, sem-www e http/https
+   * de uma vez, e o site responde nos três.
+   */
+  verification: {
+    google: "LcrLJZJv6-78vwJFbB5JWWTOw8nrpv1jmSDjusTIWvc",
+  },
+
   robots: {
     index: true,
     follow: true,
