@@ -47,14 +47,30 @@ export function autoDealerSchema(store: StoreInfo = STORE_DEFAULTS) {
       name: `${siteConfig.city}, ${siteConfig.stateName}`,
     },
     sameAs: [store.instagramUrl],
-    priceRange: "$$",
-    // Reported by the business; kept in one place so it is never invented.
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: store.ratingValue,
-      reviewCount: store.ratingCount,
-      bestRating: siteConfig.rating.scale,
-    },
+
+    /*
+     * Sem `aggregateRating` e sem `priceRange`, os dois de propósito.
+     *
+     * A nota de 4,8 é do Google Meu Negócio. Marcá-la aqui como se fosse do
+     * próprio site é avaliação de terceiro apresentada como sua, o que as
+     * diretrizes de rich results proíbem e rende ação manual. A estrela no
+     * resultado de busca vem do perfil do Google, não daqui — a seção visível
+     * na página continua mostrando a nota, com crédito, que é o permitido.
+     *
+     * `priceRange` diria "$$" para uma loja com carros de R$ 24 mil a R$ 118
+     * mil. Não é preço, é ruído.
+     */
+
+    // A rota da imagem de compartilhamento não serve aqui: o Next publica
+    // com hash no caminho, e um /opengraph-image sem ele dá 404. O logo é
+    // estável e é o que o Google mostra ao lado do nome da loja.
+    image: `${siteConfig.url}/brand/dsc-seminovos.png`,
+    logo: `${siteConfig.url}/brand/dsc-seminovos.png`,
+    knowsAbout: [
+      "Venda de carros seminovos",
+      "Financiamento de veículos",
+      "Avaliação e troca de veículos",
+    ],
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
