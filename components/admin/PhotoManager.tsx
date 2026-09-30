@@ -207,9 +207,9 @@ export function PhotoManager({
             ref={inputRef}
             id="fotos"
             type="file"
-            // `.svg` is spelled out because the picker's own `image/*` filter
-            // hides it on some systems.
-            accept="image/*,.svg"
+            // .svg e .heic vêm escritos porque o filtro `image/*` do seletor
+            // esconde os dois em vários sistemas — e HEIC é o padrão do iPhone.
+            accept="image/*,.svg,.heic,.heif"
             multiple
             className="sr-only"
             disabled={busy}

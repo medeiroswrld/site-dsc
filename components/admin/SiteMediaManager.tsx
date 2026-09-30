@@ -214,7 +214,7 @@ function SlotCard({
             ref={inputRef}
             id={`slot-${slot.id}`}
             type="file"
-            accept={isVideo ? "video/mp4,video/webm" : "image/*,.svg"}
+            accept={isVideo ? "video/mp4,video/webm" : "image/*,.svg,.heic,.heif"}
             className="sr-only"
             disabled={busy}
             onChange={(event) => {

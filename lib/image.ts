@@ -48,6 +48,47 @@ export function isAcceptedImage(file: File): boolean {
   return ACCEPTED_TYPES.includes(file.type) || file.type.startsWith("image/");
 }
 
+/**
+ * iPhone grava em HEIC desde 2017, e o formato chega ao painel de dois jeitos:
+ * escolhido pelo app Arquivos, ou arrastado de um Mac. Quando o iOS entrega a
+ * foto pela galeria ele costuma converter para JPEG sozinho — mas nem sempre,
+ * e num computador nunca.
+ *
+ * O `type` vem vazio em vários sistemas que não conhecem o formato, daí a
+ * verificação pela extensão também.
+ */
+function isHeicFile(file: File): boolean {
+  return (
+    file.type === "image/heic" ||
+    file.type === "image/heif" ||
+    /\.hei[cf]$/i.test(file.name)
+  );
+}
+
+/**
+ * Decodifica HEIC no navegador.
+ *
+ * Nenhum navegador além do Safari decodifica HEIC nativamente, então
+ * `createImageBitmap` falha e a foto ia parar no fallback — subindo como
+ * arquivo bruto, que o Storage recusa. Aqui um decodificador em WebAssembly
+ * resolve isso.
+ *
+ * São 3 MB, e por isso o import é dinâmico: só desce quando alguém de fato
+ * escolhe um HEIC, e só no painel. Quem envia JPEG nunca paga por ele.
+ *
+ * A saída é um ImageBitmap, de propósito — assim o HEIC segue exatamente o
+ * mesmo caminho das demais fotos: mesma redução, mesma conversão para WebP,
+ * mesmo resultado no Storage.
+ */
+async function decodeHeic(file: File): Promise<ImageBitmap> {
+  const { heicTo } = await import("heic-to/next");
+  return heicTo({
+    blob: file,
+    type: "bitmap",
+    options: { imageOrientation: "from-image" },
+  });
+}
+
 /** Some systems hand over an SVG with an empty or generic `type`. */
 export function isVectorFile(file: File): boolean {
   return file.type === VECTOR_TYPE || /\.svg$/i.test(file.name);
@@ -187,12 +228,22 @@ export async function preparePhoto(file: File): Promise<PreparedPhoto> {
     originalSize: file.size,
   };
 
-  if (typeof createImageBitmap !== "function") return fallback;
+  // Para HEIC o arquivo original não serve de reserva: nenhum navegador além
+  // do Safari o exibe, e o Storage nem aceita gravá-lo. Ou a conversão dá
+  // certo, ou é preciso dizer isso a quem está enviando.
+  const heic = isHeicFile(file);
+
+  if (typeof createImageBitmap !== "function") {
+    if (heic) throw new Error("Este navegador não consegue converter fotos HEIC do iPhone.");
+    return fallback;
+  }
 
   try {
     // `from-image` applies the EXIF orientation, so portrait phone photos do
     // not arrive sideways.
-    const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+    const bitmap = isHeicFile(file)
+      ? await decodeHeic(file)
+      : await createImageBitmap(file, { imageOrientation: "from-image" });
 
     const wasResized = Math.max(bitmap.width, bitmap.height) > MAX_EDGE;
     const canvas = downscale(bitmap, MAX_EDGE);
@@ -204,10 +255,15 @@ export async function preparePhoto(file: File): Promise<PreparedPhoto> {
       canvas.toBlob(resolve, "image/webp", QUALITY),
     );
 
-    if (!blob) return fallback;
+    if (!blob) {
+      if (heic) throw new Error("Não foi possível converter esta foto HEIC.");
+      return fallback;
+    }
 
     // An already-small photo that re-encodes larger is better left untouched.
-    if (blob.size >= file.size && !wasResized) return fallback;
+    // Exceto vindo de HEIC: o formato comprime tão bem que o WebP quase sempre
+    // sai maior, e devolver o original aqui significaria recusa no Storage.
+    if (!heic && blob.size >= file.size && !wasResized) return fallback;
 
     return {
       blob,
@@ -217,7 +273,15 @@ export async function preparePhoto(file: File): Promise<PreparedPhoto> {
       height,
       originalSize: file.size,
     };
-  } catch {
+  } catch (error) {
+    // A falha do HEIC precisa chegar a quem enviou: cair no fallback aqui
+    // produziria "formato não aceito" lá na frente, depois da espera, sem
+    // pista nenhuma de que o problema foi a conversão.
+    if (heic) {
+      throw error instanceof Error
+        ? error
+        : new Error("Não foi possível converter esta foto HEIC.");
+    }
     return fallback;
   }
 }

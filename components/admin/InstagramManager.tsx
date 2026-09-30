@@ -160,7 +160,7 @@ export function InstagramManager({ posts }: { posts: AdminInstagramPost[] }) {
             ref={inputRef}
             id="fotos-instagram"
             type="file"
-            accept="image/*,.svg"
+            accept="image/*,.svg,.heic,.heif"
             multiple
             className="sr-only"
             disabled={busy}
