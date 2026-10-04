@@ -45,7 +45,20 @@ export const ACCEPTED_TYPES = [
 ];
 
 export function isAcceptedImage(file: File): boolean {
-  return ACCEPTED_TYPES.includes(file.type) || file.type.startsWith("image/");
+  // A extensão conta tanto quanto o tipo.
+  //
+  // `file.type` vem vazio sempre que o sistema não conhece o formato — é o
+  // caso de HEIC no Windows sem o codec da Microsoft instalado, e acontece
+  // também com SVG em alguns ambientes. Checar só o tipo fazia a foto do
+  // iPhone ser descartada aqui, antes de chegar ao conversor, com a mensagem
+  // genérica de "nenhum arquivo de imagem reconhecido" — que não dá pista
+  // nenhuma de que o problema era o formato.
+  return (
+    ACCEPTED_TYPES.includes(file.type) ||
+    file.type.startsWith("image/") ||
+    isHeicFile(file) ||
+    isVectorFile(file)
+  );
 }
 
 /**
