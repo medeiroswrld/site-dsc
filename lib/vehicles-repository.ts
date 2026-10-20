@@ -7,6 +7,7 @@ import { logger } from "@/lib/logger";
 import {
   buscarEstoqueDoCrm,
   feedConfigurado,
+  motivoDaUltimaFalha,
   normalizaMarca,
   veiculoDoFeed,
   type FeedVeiculo,
@@ -275,7 +276,10 @@ export const getAllVehicles = cache(async function getAllVehicles(): Promise<
   // `null` e falha (rede, token revogado, loja suspensa com 402). Diferente de
   // lista vazia: aqui o site mantem o que tem em vez de apagar a vitrine.
   if (!doCrm) {
-    logger.warn("estoque.feed_indisponivel", { locais: locais.length });
+    logger.warn("estoque.feed_indisponivel", {
+      motivo: motivoDaUltimaFalha(),
+      locais: locais.length,
+    });
     return locais;
   }
 

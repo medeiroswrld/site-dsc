@@ -293,32 +293,94 @@ export function feedHost(): string | null {
 }
 
 /**
- * Busca o estoque no CRM.
+ * Teto de espera. Existe porque a falta dele derrubou o build de 20/10:
  *
- * Devolve `null` em qualquer problema — rede, token revogado, loja suspensa
- * (o feed responde 402 nesse caso, de propósito, para o site poder manter o
- * que já tem). `null` é diferente de lista vazia: quem chama usa isso para
- * cair no banco do próprio site em vez de apagar a vitrine.
+ *     Failed to build /estoque/renault-sandero-zen10mt-2019 after 3 attempts
+ *     because it took more than 60 seconds
+ *
+ * São 37 páginas estáticas, e cada uma chama isto. Um feed que para de
+ * responder vira 37 esperas de 60s e o build inteiro morre — ou seja, uma
+ * indisponibilidade do CRM passava a impedir qualquer deploy deste site.
+ * Com teto, o pior caso é o site subir com o estoque local.
  */
-export async function buscarEstoqueDoCrm(): Promise<FeedVeiculo[] | null> {
-  if (!feedConfigurado) return null;
+const TEMPO_LIMITE_MS = 8_000;
 
+/** Depois de falhar, não insiste por um tempo. Ver `buscarEstoqueDoCrm`. */
+const ESPERA_APOS_FALHA_MS = 30_000;
+
+let emVoo: Promise<FeedVeiculo[] | null> | null = null;
+let naoTentarAntesDe = 0;
+let ultimaFalha = "";
+
+/** Por que a última tentativa falhou. Vai para o log de quem chama. */
+export function motivoDaUltimaFalha(): string {
+  return ultimaFalha;
+}
+
+async function buscar(): Promise<FeedVeiculo[] | null> {
   try {
     const r = await fetch(feedUrl, {
       // O feed já manda `max-age=300`. Repetir aqui mantém o mesmo prazo se
       // alguém mexer no cache do fetch.
       next: { revalidate: 300 },
       headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(TEMPO_LIMITE_MS),
     });
 
-    if (!r.ok) return null;
+    if (!r.ok) {
+      // O status é o que separa token errado (400) de loja suspensa (402) de
+      // token que não existe (404) de feed fora do ar (5xx). Sem ele, o log
+      // dizia só "não deu" e sobrava adivinhação.
+      ultimaFalha = `http_${r.status}`;
+      return null;
+    }
 
     const corpo = (await r.json()) as FeedResposta;
     const lista = corpo?.veiculos;
-    if (!Array.isArray(lista) || lista.length === 0) return null;
+    if (!Array.isArray(lista) || lista.length === 0) {
+      ultimaFalha = "sem_veiculos";
+      return null;
+    }
 
+    ultimaFalha = "";
     return lista;
-  } catch {
+  } catch (e) {
+    const nome = e instanceof Error ? e.name : "erro";
+    ultimaFalha = nome === "TimeoutError" ? "timeout" : `excecao_${nome}`;
     return null;
+  }
+}
+
+/**
+ * Busca o estoque no CRM.
+ *
+ * Devolve `null` em qualquer problema — rede, token revogado, loja suspensa
+ * (o feed responde 402 nesse caso, de propósito, para o site poder manter o
+ * que já tem). `null` é diferente de lista vazia: quem chama usa isso para
+ * cair no banco do próprio site em vez de apagar a vitrine.
+ *
+ * ── Por que a memória, e não só o cache do `fetch` ───────────────────────
+ *
+ * O cache do `fetch` do Next guarda SUCESSO. Falha não fica guardada, então
+ * cada uma das 37 páginas tentava de novo — e foi assim que uma falha única
+ * virou 37 tentativas e travou o build.
+ *
+ * `emVoo` junta as chamadas simultâneas numa só, e `naoTentarAntesDe` segura
+ * as seguintes por 30s depois de uma falha. Trinta segundos, e não para
+ * sempre, porque em produção o site precisa se recuperar sozinho quando o
+ * CRM voltar — sem esperar um deploy.
+ */
+export async function buscarEstoqueDoCrm(): Promise<FeedVeiculo[] | null> {
+  if (!feedConfigurado) return null;
+  if (Date.now() < naoTentarAntesDe) return null;
+  if (emVoo) return emVoo;
+
+  emVoo = buscar();
+  try {
+    const r = await emVoo;
+    if (r === null) naoTentarAntesDe = Date.now() + ESPERA_APOS_FALHA_MS;
+    return r;
+  } finally {
+    emVoo = null;
   }
 }
