@@ -283,6 +283,28 @@ export function veiculoDoFeed(v: FeedVeiculo, slug: string): Vehicle {
 export const feedUrl = (process.env.CRM_FEED_URL ?? "").trim();
 export const feedConfigurado = Boolean(feedUrl);
 
+/**
+ * A URL é colada à mão no painel da Vercel, e colar ali estraga valor com
+ * facilidade — já aconteceu neste projeto antes (ver `lib/supabase/config.ts`,
+ * onde a URL do Supabase chegou com uma quebra de linha no fim).
+ *
+ * Em 20/10 aconteceu de novo com esta variável: o `fetch` lançou TypeError e o
+ * log dizia só "excecao_TypeError", o que custou uma rodada de deploy até
+ * alguém entender que o problema era o valor e não o feed.
+ *
+ * Validar aqui transforma isso num aviso que se lê de primeira, com o tamanho e
+ * o início do que chegou — sem expor o token, que vem no fim.
+ */
+export const feedUrlValida = (() => {
+  if (!feedConfigurado) return false;
+  try {
+    const u = new URL(feedUrl);
+    return u.protocol === "https:";
+  } catch {
+    return false;
+  }
+})();
+
 /** Host do CRM, para o next.config autorizar as fotos. Null se não houver feed. */
 export function feedHost(): string | null {
   try {
@@ -372,6 +394,15 @@ async function buscar(): Promise<FeedVeiculo[] | null> {
  */
 export async function buscarEstoqueDoCrm(): Promise<FeedVeiculo[] | null> {
   if (!feedConfigurado) return null;
+
+  // Antes de tentar a rede: se o valor nem URL é, diga isso em vez de deixar
+  // o `fetch` estourar um TypeError genérico.
+  if (!feedUrlValida) {
+    ultimaFalha =
+      `url_invalida (${feedUrl.length} caracteres, comeca com "${feedUrl.slice(0, 30)}")`;
+    return null;
+  }
+
   if (Date.now() < naoTentarAntesDe) return null;
   if (emVoo) return emVoo;
 
