@@ -4,6 +4,14 @@ import { vehicles as demoVehicles } from "@/data/vehicles";
 import { isSupabaseConfigured, photoUrl } from "@/lib/supabase/config";
 import { createSupabasePublicClient } from "@/lib/supabase/public";
 import { logger } from "@/lib/logger";
+import {
+  buscarEstoqueDoCrm,
+  feedConfigurado,
+  normalizaMarca,
+  veiculoDoFeed,
+  type FeedVeiculo,
+} from "@/lib/crm-feed";
+import { uniqueSlug, vehicleSlug } from "@/lib/slug";
 import type { StockFacets } from "@/lib/vehicle-filters";
 import type { VehicleRowWithImages } from "@/lib/supabase/types";
 import type {
@@ -102,7 +110,7 @@ export const VEHICLES_TAG = "vehicles";
  * before React could render a single card. A dealership's stock changes a few
  * times a week, so re-reading it on every visit buys nothing.
  */
-const loadVehicles = unstable_cache(
+const carregarLocais = unstable_cache(
   async (): Promise<Vehicle[]> => {
     const supabase = createSupabasePublicClient();
     const { data, error } = await supabase
@@ -123,12 +131,155 @@ const loadVehicles = unstable_cache(
   { tags: [VEHICLES_TAG] },
 );
 
-/** `cache` dedupes within one render; `unstable_cache` holds across requests. */
+/* -------------------------------------------------------------------------- */
+/*  Casamento entre o feed do CRM e o que ja esta aqui                        */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Nao existe id comum entre o CRM e este site: os 26 veiculos daqui entraram
+ * por script, em agosto, e os do CRM foram cadastrados a parte. O casamento e
+ * por aproximacao, e serve a UM proposito: carro que ja esta no ar precisa
+ * MANTER o slug dele.
+ *
+ * Gerar slug novo trocaria o endereco de cada pagina de veiculo e jogaria fora
+ * o que o Google ja indexou. Por isso o feed herda o slug do registro local
+ * quando reconhece o mesmo carro.
+ *
+ * O ponto difícil: o CRM enfia o veiculo todo em `model` ("S10 LS 2.8 TDI CD
+ * 4X4") e aqui ele esta separado em `model` + `version` ("S10" / "LS 2.8 TDI
+ * CD 4x4"). Casar por `model` igual perdia metade dos carros, medido.
+ */
+
+/** Palavras que nao distinguem carro nenhum e so inflariam a nota. */
+const RUIDO = new Set([
+  "flex", "at", "mt", "aut", "automatico", "manual", "cd", "ce", "p", "2p", "4p",
+]);
+
+function palavras(...partes: Array<string | undefined>): Set<string> {
+  const texto = partes
+    .filter(Boolean)
+    .join(" ")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+
+  return new Set(
+    (texto.match(/[a-z0-9]+/g) ?? []).filter((p) => !RUIDO.has(p)),
+  );
+}
+
+/** Quanto das palavras do registro local aparecem no nome vindo do CRM. */
+function nota(doCrm: FeedVeiculo, local: Vehicle): number {
+  const a = palavras(doCrm.modelo, doCrm.versao);
+  const b = palavras(local.model, local.version);
+  if (b.size === 0) return 0;
+
+  let comuns = 0;
+  for (const p of b) if (a.has(p)) comuns += 1;
+  return comuns / b.size;
+}
+
+const CORTE = 0.5;
+
+/**
+ * O catalogo final: estoque a venda vindo do CRM, mais o historico de
+ * vendidos que ja estava aqui.
+ *
+ * Vendido fica porque a pagina dele tem valor de busca e o feed nunca o
+ * devolve — se dependesse so do feed, 17 paginas indexadas sairiam do ar de
+ * uma vez.
+ *
+ * Carro `available` daqui que o CRM NAO tem sai do site. Foi uma decisao: o
+ * CRM e a fonte de verdade do que esta a venda, e anunciar o que a loja nao
+ * tem gera a pior ligacao que uma revenda recebe.
+ */
+function mesclar(doCrm: FeedVeiculo[], locais: Vehicle[]): Vehicle[] {
+  const pares: Array<{ n: number; i: number; j: number }> = [];
+
+  doCrm.forEach((c, i) => {
+    locais.forEach((l, j) => {
+      if (normalizaMarca(c.marca) !== normalizaMarca(l.brand)) return;
+      if ((Number(c.ano) || 0) !== l.yearManufacture) return;
+      const n = nota(c, l);
+      if (n >= CORTE) pares.push({ n, i, j });
+    });
+  });
+
+  // Melhor nota primeiro, e cada carro casa uma vez so.
+  pares.sort((x, y) => y.n - x.n);
+  const slugDoCrm = new Map<number, string>();
+  const usados = new Set<number>();
+  for (const { i, j } of pares) {
+    if (slugDoCrm.has(i) || usados.has(j)) continue;
+    slugDoCrm.set(i, locais[j].slug);
+    usados.add(j);
+  }
+
+  const tomados = new Set(locais.map((l) => l.slug));
+  const doFeed = doCrm.map((c, i) => {
+    const herdado = slugDoCrm.get(i);
+    const slug =
+      herdado ??
+      uniqueSlug(
+        vehicleSlug({
+          brand: normalizaMarca(c.marca),
+          model: c.modelo ?? "",
+          version: c.versao ?? "",
+          yearModel: Number(c.ano) || 0,
+        }),
+        tomados,
+      );
+    tomados.add(slug);
+    return withFallbackImage(veiculoDoFeed(c, slug));
+  });
+
+  const vendidos = locais.filter(
+    (l, j) => !usados.has(j) && l.status === "sold",
+  );
+
+  const descartados = locais.filter(
+    (l, j) => !usados.has(j) && l.status !== "sold",
+  );
+  if (descartados.length > 0) {
+    // Visivel de proposito: e um carro que o site anunciava e o CRM nao tem.
+    logger.warn("estoque.local_sem_par_no_crm", {
+      slugs: descartados.map((l) => l.slug),
+    });
+  }
+
+  return [...doFeed, ...vendidos];
+}
+
+/**
+ * `cache` dedupes within one render; `unstable_cache` holds across requests.
+ *
+ * A ordem das fontes e uma cascata, e nenhuma delas devolve lista vazia:
+ *
+ *     feed do CRM  ->  banco deste site  ->  estoque de demonstracao
+ *
+ * O feed fica FORA do `unstable_cache` de proposito. Aquele cache nao tem
+ * prazo — e invalidado por `revalidateTag`, que so o painel deste site chama.
+ * Com o feed dentro dele, carro cadastrado no CRM nunca apareceria: o site
+ * ficaria com cara de funcionando e congelado. O `fetch` do feed tem o seu
+ * proprio prazo de 300s.
+ */
 export const getAllVehicles = cache(async function getAllVehicles(): Promise<
   Vehicle[]
 > {
   if (!isSupabaseConfigured) return demoVehicles;
-  return loadVehicles();
+
+  const locais = await carregarLocais();
+  if (!feedConfigurado) return locais;
+
+  const doCrm = await buscarEstoqueDoCrm();
+  // `null` e falha (rede, token revogado, loja suspensa com 402). Diferente de
+  // lista vazia: aqui o site mantem o que tem em vez de apagar a vitrine.
+  if (!doCrm) {
+    logger.warn("estoque.feed_indisponivel", { locais: locais.length });
+    return locais;
+  }
+
+  return mesclar(doCrm, locais);
 });
 
 /**

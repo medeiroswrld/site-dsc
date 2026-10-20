@@ -5,6 +5,16 @@ import type { NextConfig } from "next";
  * host it was not told about. The hostname is derived from the same env var
  * the app uses, so connecting a project is still a one-file change.
  */
+/** Host do CRM, de onde vem a foto do carro que o feed anuncia. */
+const crmHost = (() => {
+  try {
+    const url = (process.env.CRM_FEED_URL ?? "").trim();
+    return url ? new URL(url).hostname : null;
+  } catch {
+    return null;
+  }
+})();
+
 const supabaseHost = (() => {
   try {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -74,15 +84,16 @@ const nextConfig: NextConfig = {
      * detail buyers zoom into — paint finish, wheels, interior stitching.
      */
     qualities: [75, 90],
-    remotePatterns: supabaseHost
-      ? [
-          {
-            protocol: "https",
-            hostname: supabaseHost,
-            pathname: "/storage/v1/object/public/**",
-          },
-        ]
-      : [],
+    // As fotos do estoque vivem em DOIS projetos: o do site (fotos subidas
+    // pelo painel) e o do CRM (as que vem pelo feed). O otimizador do Next
+    // recusa host que nao esteja aqui, e a falha e um 400 em CADA imagem.
+    remotePatterns: [supabaseHost, crmHost]
+      .filter((host): host is string => Boolean(host))
+      .map((hostname) => ({
+        protocol: "https" as const,
+        hostname,
+        pathname: "/storage/v1/object/public/**",
+      })),
   },
   // sharp é usado direto na rota da imagem de compartilhamento; mantê-lo
   // fora do bundle evita que o empacotador tente resolver o binário nativo.

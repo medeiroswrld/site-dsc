@@ -17,7 +17,10 @@ export type BodyType =
   | "Picape"
   | "Perua"
   | "Utilitário"
-  | "Cupê";
+  | "Cupê"
+  // A DSC tem 4 motos no estoque a venda (Fazer 150, CG 160, duas Biz 125).
+  // Sem este valor elas teriam de ser escondidas ou classificadas como carro.
+  | "Moto";
 
 export interface VehicleImage {
   /** Optimised source used in grids and the gallery viewport. */
