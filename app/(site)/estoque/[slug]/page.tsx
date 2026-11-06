@@ -26,19 +26,23 @@ interface PageProps {
 }
 
 /**
- * Só existe página para o que está à venda.
+ * Só existe página para o que está à venda — mas o estoque muda sem deploy.
  *
- * `dynamicParams: false` é o que faz um veículo vendido deixar de existir de
- * verdade — a rota é recusada no roteamento e o servidor responde 404.
+ * Até 06/11/2026 isto era `dynamicParams = false`: só existia página para os
+ * carros que estavam no feed NA HORA DO BUILD. Como a listagem do /estoque lê
+ * o CRM ao vivo, todo carro cadastrado depois do último deploy aparecia na
+ * lista e dava 404 ao clicar. Medido em produção: 15 de 30 carros.
  *
- * As duas alternativas foram testadas e descartadas. `redirect()` numa rota
- * estática vira `<meta http-equiv="refresh" content="1;url=/estoque">`: um
- * segundo olhando a página do carro vendido, título dizendo "à venda", e
- * resposta 200. `notFound()` renderiza a tela certa mas também responde 200,
- * porque a rota é gerada sob demanda e fica em cache — um soft 404, que o
- * Google trata como página real.
+ * Agora a página de um carro novo é gerada no primeiro acesso e renovada a
+ * cada 5 min (o mesmo prazo do feed). Carro vendido sai do feed e, na
+ * renovação seguinte, a página passa a responder 404.
+ *
+ * O 404 continua sendo 404 de verdade, e não soft 404, porque o
+ * `generateMetadata` chama `notFound()` também: os metadados são resolvidos
+ * antes de a página começar a ser enviada, então o status ainda pode mudar.
  */
-export const dynamicParams = false;
+export const dynamicParams = true;
+export const revalidate = 300;
 
 export async function generateStaticParams() {
   const vehicles = await getStockVehicles();
@@ -51,9 +55,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const vehicle = await getVehicleBySlug(slug);
 
-  if (!vehicle) {
-    return { title: "Veículo não encontrado" };
-  }
+  if (!vehicle) notFound();
 
   const title = `${vehicleTitle(vehicle)} ${formatYear(vehicle)} à venda em ${siteConfig.city}`;
   const description = `${vehicleTitle(vehicle)} ${formatYear(vehicle)}, ${vehicle.mileage.toLocaleString("pt-BR")} km, ${vehicle.transmission.toLowerCase()}, ${vehicle.fuel.toLowerCase()}. Disponível na ${siteConfig.name}, em ${siteConfig.city} - ${siteConfig.state}.`;

@@ -1,7 +1,14 @@
 import { HeaderOffset } from "@/components/layout/Header";
 import { Container } from "@/components/ui/Container";
 
-/** Streaming fallback for /estoque. Mirrors the real layout's proportions. */
+/**
+ * Streaming fallback for /estoque. Mirrors the real layout's proportions.
+ *
+ * Fica dentro do grupo (lista) de propósito. Na pasta estoque/ ele também
+ * envolvia /estoque/[slug], e a página do carro começava a ser enviada com
+ * status 200 antes de saber se o carro existe: endereço inválido virava soft
+ * 404 em vez de 404.
+ */
 export default function StockLoading() {
   return (
     <>

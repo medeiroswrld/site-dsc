@@ -117,7 +117,12 @@ const carregarLocais = unstable_cache(
     const { data, error } = await supabase
       .from("vehicles")
       .select(SELECT)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      // Desempate obrigatório: 18 veículos entraram pelo mesmo script e têm o
+      // mesmo `created_at`. Sem isto o Postgres devolve esses 18 em ordem
+      // arbitrária, e o casamento com o CRM (ver `mesclar`) mudava de uma
+      // leitura para outra, trocando o slug de carros iguais.
+      .order("id", { ascending: true });
 
     if (error) {
       logger.error("estoque.read_failed", { err: error });
@@ -194,7 +199,25 @@ const CORTE = 0.5;
  * CRM e a fonte de verdade do que esta a venda, e anunciar o que a loja nao
  * tem gera a pior ligacao que uma revenda recebe.
  */
-function mesclar(doCrm: FeedVeiculo[], locais: Vehicle[]): Vehicle[] {
+function mesclar(feed: FeedVeiculo[], locaisBrutos: Vehicle[]): Vehicle[] {
+  // O slug de cada carro tem que sair igual em toda leitura: a lista do
+  // /estoque e a página do carro são geradas em momentos diferentes, e um
+  // slug que muda entre as duas é um link para 404. Então nada aqui pode
+  // depender da ordem em que as fontes devolvem os registros.
+  //
+  // Feed em ordem de entrada: o carro mais antigo fica com o slug "limpo" e
+  // um carro novo igual recebe o -2, sem renomear o que já estava no ar.
+  const doCrm = [...feed].sort(
+    (a, b) =>
+      (a.entrou_em ?? "").localeCompare(b.entrou_em ?? "") ||
+      a.id.localeCompare(b.id),
+  );
+  const locais = [...locaisBrutos].sort(
+    (a, b) =>
+      (a.createdAt ?? "").localeCompare(b.createdAt ?? "") ||
+      a.id.localeCompare(b.id),
+  );
+
   const pares: Array<{ n: number; i: number; j: number }> = [];
 
   doCrm.forEach((c, i) => {
@@ -207,7 +230,8 @@ function mesclar(doCrm: FeedVeiculo[], locais: Vehicle[]): Vehicle[] {
   });
 
   // Melhor nota primeiro, e cada carro casa uma vez so.
-  pares.sort((x, y) => y.n - x.n);
+  // Empate de nota (dois Celtas 2011 iguais) se resolve pela ordem fixa acima.
+  pares.sort((x, y) => y.n - x.n || x.i - y.i || x.j - y.j);
   const slugDoCrm = new Map<number, string>();
   const usados = new Set<number>();
   for (const { i, j } of pares) {
@@ -234,12 +258,18 @@ function mesclar(doCrm: FeedVeiculo[], locais: Vehicle[]): Vehicle[] {
     return withFallbackImage(veiculoDoFeed(c, slug));
   });
 
-  const vendidos = locais.filter(
-    (l, j) => !usados.has(j) && l.status === "sold",
+  // A ordenação acima é só para decidir slugs. A vitrine sai na ordem em que
+  // as fontes mandaram, como antes.
+  const porId = new Map(doFeed.map((v) => [v.id, v]));
+  const vitrine = feed.map((c) => porId.get(c.id)!);
+  const casados = new Set([...usados].map((j) => locais[j].id));
+
+  const vendidos = locaisBrutos.filter(
+    (l) => !casados.has(l.id) && l.status === "sold",
   );
 
-  const descartados = locais.filter(
-    (l, j) => !usados.has(j) && l.status !== "sold",
+  const descartados = locaisBrutos.filter(
+    (l) => !casados.has(l.id) && l.status !== "sold",
   );
   if (descartados.length > 0) {
     // Visivel de proposito: e um carro que o site anunciava e o CRM nao tem.
@@ -248,7 +278,7 @@ function mesclar(doCrm: FeedVeiculo[], locais: Vehicle[]): Vehicle[] {
     });
   }
 
-  return [...doFeed, ...vendidos];
+  return [...vitrine, ...vendidos];
 }
 
 /**
